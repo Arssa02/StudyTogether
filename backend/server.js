@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/api/health',  (req, res) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
