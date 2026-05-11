@@ -1,8 +1,3 @@
-/**
- * StudyTogether Backend Server
- * Social Study Session Coordination and Tracking System
- */
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
