@@ -16,8 +16,11 @@ app.get('/api/health',  (req, res) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
-// Routes will be imported here
-// app.use('/api/auth', require('./routes/auth'));
+// Routes
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
+// Additional routes (to be implemented)
 // app.use('/api/users', require('./routes/users'));
 // app.use('/api/sessions', require('./routes/sessions'));
 // app.use('/api/participation', require('./routes/participation'));
