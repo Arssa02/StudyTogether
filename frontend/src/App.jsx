@@ -1,6 +1,9 @@
 import './App.css'
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 
-function App() {
+function DashboardPage() {
   return (
     <main className="app-shell">
       <aside className="sidebar-panel">
@@ -11,11 +14,15 @@ function App() {
         </div>
 
         <nav className="sidebar-nav">
-          <a href="#dashboard" className="active">
+          <NavLink to="/dashboard" end className={({ isActive }) => (isActive ? 'active' : '')}>
             Dashboard
-          </a>
-          <a href="#sessions">Sessions</a>
-          <a href="#profile">Profile</a>
+          </NavLink>
+          <NavLink to="/login" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Login
+          </NavLink>
+          <NavLink to="/register" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Register
+          </NavLink>
         </nav>
 
         <div className="sidebar-card">
@@ -50,6 +57,17 @@ function App() {
         </div>
       </section>
     </main>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+    </Routes>
   )
 }
 
