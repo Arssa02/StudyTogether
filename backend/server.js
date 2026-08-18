@@ -21,7 +21,7 @@ const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
 // Additional routes (to be implemented)
-// app.use('/api/users', require('./routes/users'));
+app.use('/api/users', require('./routes/users'));
 // app.use('/api/sessions', require('./routes/sessions'));
 // app.use('/api/participation', require('./routes/participation'));
 // app.use('/api/activity', require('./routes/activity'));

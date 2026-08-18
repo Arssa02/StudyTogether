@@ -75,8 +75,22 @@ const loginUser = async ({ email, password }) => {
 	};
 };
 
+// returns the currently authenticated user's safe profile data.
+const getUserById = async (id) => {
+    const user = await userModel.findById(id);
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return sanitizeUser(user);
+};
+
 // makes functions usable in controllers
 module.exports = {
-	registerUser,
-	loginUser,
+    registerUser,
+    loginUser,
+    getUserById,
 };
