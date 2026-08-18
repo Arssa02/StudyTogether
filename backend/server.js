@@ -25,7 +25,7 @@ app.use('/api/users', require('./routes/users'));
 // app.use('/api/sessions', require('./routes/sessions'));
 // app.use('/api/participation', require('./routes/participation'));
 // app.use('/api/activity', require('./routes/activity'));
-// app.use('/api/friends', require('./routes/friends'));
+app.use('/api/friends', require('./routes/friends'));
 // app.use('/api/calendar', require('./routes/calendar'));
 
 // Error handling middleware
