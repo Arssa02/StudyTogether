@@ -19,13 +19,16 @@ app.get('/api/health',  (req, res) => {
 // Routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+app.use('/api/users', require('./routes/users'));
+app.use('/api/friends', require('./routes/friends'));
+app.use('/api/planned-sessions', require('./routes/plannedSessions'));
 
 // Additional routes (to be implemented)
-app.use('/api/users', require('./routes/users'));
+
 // app.use('/api/sessions', require('./routes/sessions'));
 // app.use('/api/participation', require('./routes/participation'));
 // app.use('/api/activity', require('./routes/activity'));
-app.use('/api/friends', require('./routes/friends'));
+
 // app.use('/api/calendar', require('./routes/calendar'));
 
 // Error handling middleware
