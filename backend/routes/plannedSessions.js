@@ -8,6 +8,9 @@ router.use(authenticateToken);
 
 router.post('/', plannedSessionController.create);
 router.get('/', plannedSessionController.getMine);
+
+router.get('/friend/:friendId', plannedSessionController.getFriend);
+
 router.patch('/:id', plannedSessionController.update);
 router.delete('/:id', plannedSessionController.remove);
 

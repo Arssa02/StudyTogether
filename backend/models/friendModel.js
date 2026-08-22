@@ -121,6 +121,23 @@ const getAcceptedFriends = async (currentUserId) => {
     return rows;
 };
 
+const areAcceptedFriends = async (userAId, userBId) => {
+    const userId = Math.min(userAId, userBId);
+    const friendId = Math.max(userAId, userBId);
+
+    const sql = `
+        SELECT id
+        FROM friend
+        WHERE user_id = ?
+          AND friend_id = ?
+          AND status = 'accepted'
+        LIMIT 1
+    `;
+
+    const [rows] = await db.execute(sql, [userId, friendId]);
+    return rows.length > 0;
+};
+
 module.exports = {
     findByPair,
     createRequest,
@@ -129,4 +146,5 @@ module.exports = {
     acceptRequest,
     deleteById,
     getAcceptedFriends,
+    areAcceptedFriends,
 };

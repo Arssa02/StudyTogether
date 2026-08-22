@@ -1,4 +1,5 @@
 const plannedSessionModel = require('../models/plannedSessionModel');
+const friendModel = require('../models/friendModel');
 
 const validateTimes = (startTime, endTime) => {
     const start = new Date(startTime);
@@ -106,9 +107,31 @@ const deletePlannedSession = async (currentUserId, id) => {
     return { message: 'Planned session deleted' };
 };
 
+const getFriendPlannedSessions = async (currentUserId, friendId) => {
+    if (currentUserId === friendId) {
+        const error = new Error('Use your own planned sessions endpoint');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const areFriends = await friendModel.areAcceptedFriends(
+        currentUserId,
+        friendId
+    );
+
+    if (!areFriends) {
+        const error = new Error('You can only view planned sessions of accepted friends');
+        error.statusCode = 403;
+        throw error;
+    }
+
+    return plannedSessionModel.getByUserId(friendId);
+};
+
 module.exports = {
     createPlannedSession,
     getMyPlannedSessions,
+    getFriendPlannedSessions,
     updatePlannedSession,
     deletePlannedSession,
 };

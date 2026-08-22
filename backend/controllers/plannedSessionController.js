@@ -64,9 +64,27 @@ const remove = async (req, res, next) => {
     }
 };
 
+const getFriend = async (req, res, next) => {
+    try {
+        const sessions = await plannedSessionService.getFriendPlannedSessions(
+            req.user.id,
+            Number(req.params.friendId)
+        );
+
+        return res.status(200).json({ sessions });
+    } catch (err) {
+        if (err.statusCode) {
+            return res.status(err.statusCode).json({ error: err.message });
+        }
+
+        return next(err);
+    }
+};
+
 module.exports = {
     create,
     getMine,
+    getFriend,
     update,
     remove,
 };
