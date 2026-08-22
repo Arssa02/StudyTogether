@@ -71,10 +71,27 @@ const remove = async (id) => {
     await db.execute(sql, [id]);
 };
 
+const attachStudySession = async (plannedSessionId, studySessionId) => {
+    const sql = `
+        UPDATE planned_session
+        SET session_id = ?
+        WHERE id = ?
+          AND session_id IS NULL
+    `;
+
+    const [result] = await db.execute(sql, [
+        studySessionId,
+        plannedSessionId,
+    ]);
+
+    return result.affectedRows > 0;
+};
+
 module.exports = {
     create,
     findById,
     getByUserId,
     update,
     remove,
+    attachStudySession
 };
