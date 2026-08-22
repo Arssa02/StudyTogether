@@ -1,6 +1,7 @@
 const express = require('express');
 const studySessionController = require('../controllers/studySessionController');
 const authenticateToken = require('../middleware/authMiddleware');
+const studyActivityController = require('../controllers/studyActivityController');
 
 const router = express.Router();
 
@@ -17,5 +18,10 @@ router.post(
 router.post('/:id/join', studySessionController.join);
 router.post('/:id/leave', studySessionController.leave);
 router.get('/:id/participants', studySessionController.getParticipants);
+
+router.post('/:id/activity/start', studyActivityController.start);
+router.post('/:id/activity/break', studyActivityController.takeBreak);
+router.post('/:id/activity/resume', studyActivityController.resume);
+router.get('/:id/activity/me', studyActivityController.getMine);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const studySessionModel = require('../models/studySessionModel');
 const participationModel = require('../models/participationModel');
 const plannedSessionModel = require('../models/plannedSessionModel');
 const friendModel = require('../models/friendModel');
+const studyActivityService = require('./studyActivityService');
 
 const startSpontaneousSession = async (currentUserId, title) => {
     const sessionId = await studySessionModel.create({
@@ -147,6 +148,8 @@ const leaveSession = async (currentUserId, sessionId) => {
         error.statusCode = 404;
         throw error;
     }
+
+    await studyActivityService.closeCurrentActivity(participation.id);
 
     await participationModel.leave(participation.id);
 
