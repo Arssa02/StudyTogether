@@ -134,7 +134,9 @@ const declineFriendRequest = async (currentUserId, requestId) => {
 
 // Get accepted friends.
 const getFriends = async (currentUserId) => {
-    const rows = await friendModel.getAcceptedFriends(currentUserId);
+    const rows = await friendModel.getAcceptedFriendsWithStatus(
+        currentUserId
+    );
 
     return rows.map((row) => ({
         friendshipId: row.friendship_id,
@@ -143,7 +145,8 @@ const getFriends = async (currentUserId) => {
         lastName: row.last_name,
         email: row.email,
         friendsSince: row.created_on,
-    }));
+        studyStatus: row.study_status,
+    }));    
 };
 
 // Remove an accepted friend.

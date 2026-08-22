@@ -138,6 +138,60 @@ const areAcceptedFriends = async (userAId, userBId) => {
     return rows.length > 0;
 };
 
+const getAcceptedFriendsWithStatus = async (currentUserId) => {
+    const sql = `
+        SELECT
+            f.id AS friendship_id,
+            u.id,
+            u.first_name,
+            u.last_name,
+            u.email,
+            f.created_on,
+
+            CASE
+                WHEN sa.type = 'study' THEN 'studying'
+                WHEN sa.type = 'break' THEN 'break'
+                ELSE 'offline'
+            END AS study_status
+
+        FROM friend f
+
+        JOIN user u
+          ON u.id = CASE
+              WHEN f.user_id = ? THEN f.friend_id
+              ELSE f.user_id
+          END
+
+        LEFT JOIN participation p
+          ON p.user_id = u.id
+         AND p.left_at IS NULL
+
+        LEFT JOIN study_activity sa
+          ON sa.participation_id = p.id
+         AND sa.end_time IS NULL
+
+        WHERE f.status = 'accepted'
+          AND (f.user_id = ? OR f.friend_id = ?)
+
+        ORDER BY
+            CASE
+                WHEN sa.type = 'study' THEN 1
+                WHEN sa.type = 'break' THEN 2
+                ELSE 3
+            END,
+            u.first_name,
+            u.last_name
+    `;
+
+    const [rows] = await db.execute(sql, [
+        currentUserId,
+        currentUserId,
+        currentUserId,
+    ]);
+
+    return rows;
+};
+
 module.exports = {
     findByPair,
     createRequest,
@@ -146,5 +200,6 @@ module.exports = {
     acceptRequest,
     deleteById,
     getAcceptedFriends,
+    getAcceptedFriendsWithStatus,
     areAcceptedFriends,
 };
