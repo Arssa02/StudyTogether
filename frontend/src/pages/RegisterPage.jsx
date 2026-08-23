@@ -1,138 +1,111 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+function RegisterPage() {
+  const navigate = useNavigate();
 
-export default function RegisterPage() {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
 
-  async function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
-    setSuccessMessage('')
-    setIsSubmitting(true)
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (event) => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    setError('');
+    setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, email, password }),
-      })
+      await register(
+        form.firstName,
+        form.lastName,
+        form.email,
+        form.password
+      );
 
-      const payload = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        const message = payload?.error || payload?.message || 'Registration failed. Please try again.'
-        throw new Error(message)
-      }
-
-      setSuccessMessage('Account created! You can now log in.')
-      setFirstName('')
-      setLastName('')
-      setEmail('')
-      setPassword('')
-    } catch (requestError) {
-      setError(requestError.message)
+      navigate('/login');
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setIsSubmitting(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <main className="app-shell">
-      <section className="content-panel" style={{ maxWidth: '480px' }}>
-        <header className="page-header" style={{ marginBottom: '1rem' }}>
-          <div>
-            <p className="eyebrow">StudyTogether</p>
-            <h1 style={{ fontSize: '2.1rem' }}>Register</h1>
-            <p className="lead" style={{ marginTop: '0.4rem' }}>
-              Create a new account to get started.
-            </p>
-          </div>
-        </header>
+    <main className="auth-page">
+      <section className="auth-card">
+        <h1>Create Account</h1>
 
-        <form className="feature-card" onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '0.4rem', marginBottom: '0.9rem' }}>
-            <label htmlFor="firstName">First name</label>
+        <form onSubmit={handleSubmit}>
+          <label>
+            First name
             <input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
+              name="firstName"
+              value={form.firstName}
+              onChange={handleChange}
               required
-              style={{ padding: '0.65rem', borderRadius: '0.6rem', border: '1px solid #475569' }}
             />
-          </div>
+          </label>
 
-          <div style={{ display: 'grid', gap: '0.4rem', marginBottom: '0.9rem' }}>
-            <label htmlFor="lastName">Last name</label>
+          <label>
+            Last name
             <input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(event) => setLastName(event.target.value)}
+              name="lastName"
+              value={form.lastName}
+              onChange={handleChange}
               required
-              style={{ padding: '0.65rem', borderRadius: '0.6rem', border: '1px solid #475569' }}
             />
-          </div>
+          </label>
 
-          <div style={{ display: 'grid', gap: '0.4rem', marginBottom: '0.9rem' }}>
-            <label htmlFor="email">Email</label>
+          <label>
+            Email
             <input
-              id="email"
+              name="email"
               type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              value={form.email}
+              onChange={handleChange}
               required
-              style={{ padding: '0.65rem', borderRadius: '0.6rem', border: '1px solid #475569' }}
             />
-          </div>
+          </label>
 
-          <div style={{ display: 'grid', gap: '0.4rem', marginBottom: '0.9rem' }}>
-            <label htmlFor="password">Password</label>
+          <label>
+            Password
             <input
-              id="password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              value={form.password}
+              onChange={handleChange}
               required
-              minLength={6}
-              style={{ padding: '0.65rem', borderRadius: '0.6rem', border: '1px solid #475569' }}
             />
-          </div>
+          </label>
 
-          {error ? (
-            <p style={{ color: '#fca5a5', marginBottom: '0.8rem' }}>{error}</p>
-          ) : null}
+          {error && <p className="form-error">{error}</p>}
 
-          {successMessage ? (
-            <p style={{ color: '#34d399', marginBottom: '0.8rem' }}>{successMessage}</p>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              padding: '0.7rem 1rem',
-              borderRadius: '0.7rem',
-              border: 'none',
-              background: '#818cf8',
-              color: '#0b0f19',
-              fontWeight: 700,
-              cursor: isSubmitting ? 'wait' : 'pointer',
-            }}
-          >
-            {isSubmitting ? 'Creating account...' : 'Register'}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
+
+        <p>
+          Already have an account?{' '}
+          <Link to="/login">Login</Link>
+        </p>
       </section>
     </main>
-  )
+  );
 }
+
+export default RegisterPage;
