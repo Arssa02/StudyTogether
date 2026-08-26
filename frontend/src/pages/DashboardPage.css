@@ -117,10 +117,10 @@
 
 .calendar-card,
 .sidebar-box {
-  padding: 18px;
-  background: #f4f5f7;
-  color: #1f2937;
-  border: 2px solid #202737;
+    padding: 18px;
+    background: #f4f5f7;
+    color: #1f2937;
+    border: 2px solid #202737;
 }
 
 .calendar-card {
@@ -150,129 +150,129 @@
 }
 
 .calendar-scroll {
-  max-height: 680px;
-  overflow-y: auto;
-  overflow-x: auto;
-  border: 1px solid #ccd1d8;
+    max-height: 680px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #ccd1d8;
 }
 
 .precise-calendar {
-  display: grid;
-  grid-template-columns: 72px repeat(7, minmax(100px, 1fr));
-  min-width: 850px;
-  background: #ffffff;
+    display: grid;
+    grid-template-columns: 72px repeat(7, minmax(100px, 1fr));
+    min-width: 850px;
+    background: #ffffff;
 }
 
 .calendar-time-column,
 .precise-day-column {
-  border-right: 1px solid #ccd1d8;
+    border-right: 1px solid #ccd1d8;
 }
 
 .precise-day-column:last-child {
-  border-right: none;
+    border-right: none;
 }
 
 .calendar-time-header,
 .precise-day-header {
-  height: 52px;
-  border-bottom: 1px solid #ccd1d8;
-  background: #ffffff;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+    height: 52px;
+    border-bottom: 1px solid #ccd1d8;
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .precise-day-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 13px;
 }
 
 .precise-day-header span {
-  color: #7b8491;
+    color: #7b8491;
 }
 
 .calendar-time-body,
 .precise-day-body {
-  position: relative;
-  height: 1200px;
-  background: #ffffff;
+    position: relative;
+    height: 1200px;
+    background: #ffffff;
 }
 
 .calendar-hour-label {
-  position: absolute;
-  left: 0;
-  right: 8px;
-  transform: translateY(-50%);
-  text-align: right;
-  font-size: 11px;
-  font-weight: 600;
-  color: #697386;
+    position: absolute;
+    left: 0;
+    right: 8px;
+    transform: translateY(-50%);
+    text-align: right;
+    font-size: 11px;
+    font-weight: 600;
+    color: #697386;
 }
 
 .calendar-hour-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #e1e4e8;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e1e4e8;
 }
 
 .precise-session {
-  position: absolute;
-  left: 5px;
-  right: 5px;
-  padding: 6px;
-  overflow: hidden;
-  box-sizing: border-box;
-  font-size: 11px;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    padding: 6px;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-size: 11px;
 }
 
 .precise-session strong,
 .precise-session span,
 .precise-session small {
-  display: block;
+    display: block;
 }
 
 .precise-session strong {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .precise-session span {
-  margin-top: 3px;
-  font-size: 10px;
+    margin-top: 3px;
+    font-size: 10px;
 }
 
 .precise-session small {
-  margin-top: 3px;
-  font-size: 9px;
-  font-weight: 700;
+    margin-top: 3px;
+    font-size: 9px;
+    font-weight: 700;
 }
 
 .precise-session.mine {
-  z-index: 1;
-  border: 2px solid #202737;
-  background: #ffffff;
-  color: #202737;
+    z-index: 1;
+    border: 2px solid #202737;
+    background: #ffffff;
+    color: #202737;
 }
 
 .precise-session.friend {
-  z-index: 2;
-  border: 2px dashed #7b8491;
-  background: #f1f3f5;
-  color: #202737;
+    z-index: 2;
+    border: 2px dashed #7b8491;
+    background: #f1f3f5;
+    color: #202737;
 }
 
 .precise-session.overlap {
-  z-index: 3;
-  border: 2px solid #202737;
-  background: #303744;
-  color: #ffffff;
+    z-index: 3;
+    border: 2px solid #202737;
+    background: #303744;
+    color: #ffffff;
 }
 
 .calendar-legend {
@@ -338,7 +338,7 @@
 }
 
 .friends-box {
-  color: #1f2937;
+    color: #1f2937;
 }
 
 .status-studying {
@@ -377,47 +377,47 @@
 }
 
 .friend-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 
-  width: 100%;
-  padding: 12px;
+    width: 100%;
+    padding: 12px;
 
-  text-align: left;
+    text-align: left;
 
-  background: #ffffff;
-  color: #202737;
+    background: #ffffff;
+    color: #202737;
 
-  border: 1px solid #c9ced6;
-  cursor: pointer;
+    border: 1px solid #c9ced6;
+    cursor: pointer;
 }
 
 .friend-row.selected {
-  border: 2px solid #202737;
-  background: #f2f3f5;
+    border: 2px solid #202737;
+    background: #f2f3f5;
 }
 
 .friend-identity {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .friend-name {
-  color: #111827;
-  font-size: 14px;
+    color: #111827;
+    font-size: 14px;
 }
 
 .friend-status {
-  font-size: 11px;
+    font-size: 11px;
 }
 
 .selected-check {
-  color: #111827;
-  font-size: 16px;
-  font-weight: 700;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
 }
 
 @media (max-width: 950px) {
@@ -492,5 +492,10 @@
 
     .sidebar-box {
         background: #f8f9fb;
+    }
+
+    .calendar-card h2,
+    .sidebar-box h2 {
+        color: #111827 !important;
     }
 }
