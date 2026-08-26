@@ -73,3 +73,6 @@ export const deletePlannedSession = (id) =>
 
 export const getFriendPlannedSessions = (friendId) =>
   apiRequest(`/planned-sessions/friend/${friendId}`);
+
+export const getFriends = () =>
+  apiRequest('/friends');
