@@ -55,6 +55,14 @@ function DashboardPage() {
       <p>
         <Link to="/profile">Open Profile</Link>
       </p>
+
+      <p>
+        <Link to="/sessions">Study Sessions</Link>
+      </p>
+
+      <p>
+        <Link to="/plan-session">+ Plan Session</Link>
+      </p>
     </main>
   );
 }

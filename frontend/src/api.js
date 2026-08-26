@@ -42,3 +42,34 @@ export const register = (firstName, lastName, email, password) =>
 
 export const getCurrentUser = () =>
   apiRequest('/users/me');
+
+export const getMyPlannedSessions = () =>
+  apiRequest('/planned-sessions');
+
+export const createPlannedSession = (title, startTime, endTime) =>
+  apiRequest('/planned-sessions', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      startTime,
+      endTime,
+    }),
+  });
+
+export const updatePlannedSession = (id, title, startTime, endTime) =>
+  apiRequest(`/planned-sessions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      title,
+      startTime,
+      endTime,
+    }),
+  });
+
+export const deletePlannedSession = (id) =>
+  apiRequest(`/planned-sessions/${id}`, {
+    method: 'DELETE',
+  });
+
+export const getFriendPlannedSessions = (friendId) =>
+  apiRequest(`/planned-sessions/friend/${friendId}`);

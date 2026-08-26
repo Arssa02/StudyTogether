@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
+import SessionsPage from './pages/SessionsPage';
+import PlanSessionPage from './pages/PlanSessionPage';
 
 function App() {
   return (
@@ -35,6 +37,24 @@ function App() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/sessions"
+        element={
+          <ProtectedRoute>
+            <SessionsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/plan-session"
+        element={
+          <ProtectedRoute>
+            <PlanSessionPage />
           </ProtectedRoute>
         }
       />
