@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
 import SessionsPage from './pages/SessionsPage';
 import PlanSessionPage from './pages/PlanSessionPage';
+import EditPlannedSessionPage from './pages/EditPlannedSessionPage';
 
 function App() {
   return (
@@ -55,6 +56,14 @@ function App() {
         element={
           <ProtectedRoute>
             <PlanSessionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/planned-sessions/:id/edit"
+        element={
+          <ProtectedRoute>
+            <EditPlannedSessionPage />
           </ProtectedRoute>
         }
       />
