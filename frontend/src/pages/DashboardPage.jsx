@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import socket from '../socket';
 
 import AppNavbar from '../components/AppNavbar';
 
@@ -52,6 +53,33 @@ function DashboardPage() {
     };
 
     loadDashboard();
+  }, []);
+
+  useEffect(() => {
+    socket.connect();
+
+    const handleFriendStatusUpdate = async () => {
+      try {
+        const friendsResult = await getFriends();
+        setFriends(friendsResult.friends);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    socket.on(
+      'friend-status-updated',
+      handleFriendStatusUpdate
+    );
+
+    return () => {
+      socket.off(
+        'friend-status-updated',
+        handleFriendStatusUpdate
+      );
+
+      socket.disconnect();
+    };
   }, []);
 
   const handleSelectFriend = async (friend) => {
@@ -569,8 +597,8 @@ function DashboardPage() {
                       type="button"
                       key={friend.friendshipId}
                       className={`friend-row ${selectedFriend?.id === friend.id
-                          ? 'selected'
-                          : ''
+                        ? 'selected'
+                        : ''
                         }`}
                       onClick={() => handleSelectFriend(friend)}
                     >

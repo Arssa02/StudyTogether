@@ -80,6 +80,7 @@ const leave = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('friend-status-updated');
 
         return res.status(200).json(result);
     } catch (err) {

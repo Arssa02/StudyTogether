@@ -12,6 +12,7 @@ const start = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('friend-status-updated');
 
         return res.status(201).json({ activity });
     } catch (err) {
@@ -35,6 +36,7 @@ const takeBreak = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('friend-status-updated');
 
         return res.status(201).json({ activity });
     } catch (err) {
@@ -58,6 +60,7 @@ const resume = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('friend-status-updated');
 
         return res.status(201).json({ activity });
     } catch (err) {
