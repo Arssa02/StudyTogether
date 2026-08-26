@@ -1,6 +1,11 @@
 .app-navbar {
     border-bottom: 1px solid #d7dbe3;
     background: #ffffff;
+
+    .app-navbar {
+        --text-h: #111827;
+        --text: #374151;
+    }
 }
 
 .navbar-inner {
@@ -53,6 +58,8 @@
     margin: 0 auto;
     padding: 30px 0 60px;
     color: #1f2937;
+    --text-h: #111827;
+    --text: #374151;
 }
 
 .dashboard-heading-row {
@@ -497,5 +504,11 @@
     .calendar-card h2,
     .sidebar-box h2 {
         color: #111827 !important;
+    }
+
+    .dashboard-page .calendar-card .calendar-card-header h2,
+    .dashboard-page .sidebar-box h2 {
+        color: #111827 !important;
+        -webkit-text-fill-color: #111827 !important;
     }
 }
