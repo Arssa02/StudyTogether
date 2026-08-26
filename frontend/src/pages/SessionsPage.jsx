@@ -4,7 +4,7 @@ import {
     deletePlannedSession,
     getMyPlannedSessions,
 } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SessionsPage() {
     const [sessions, setSessions] = useState([]);
@@ -31,6 +31,8 @@ function SessionsPage() {
             setError(err.message);
         }
     };
+
+    const navigate = useNavigate();
 
     return (
         <main>
@@ -88,7 +90,6 @@ function SessionsPage() {
             </section>
         </main>
     );
-    const navigate = useNavigate();
 }
 
 export default SessionsPage;
