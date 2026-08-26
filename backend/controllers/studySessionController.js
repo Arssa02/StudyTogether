@@ -52,6 +52,12 @@ const join = async (req, res, next) => {
             Number(req.params.id)
         );
 
+        const io = req.app.get('io');
+
+        io
+            .to(`study-session-${req.params.id}`)
+            .emit('study-room-updated');
+
         return res.status(201).json(result);
     } catch (err) {
         if (err.statusCode) {
@@ -68,6 +74,12 @@ const leave = async (req, res, next) => {
             req.user.id,
             Number(req.params.id)
         );
+
+        const io = req.app.get('io');
+
+        io
+            .to(`study-session-${req.params.id}`)
+            .emit('study-room-updated');
 
         return res.status(200).json(result);
     } catch (err) {

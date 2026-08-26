@@ -149,8 +149,36 @@ const getAcceptedFriendsWithStatus = async (currentUserId) => {
             f.created_on,
 
             CASE
-                WHEN sa.type = 'study' THEN 'studying'
-                WHEN sa.type = 'break' THEN 'break'
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM participation p
+                    JOIN study_session ss
+                        ON ss.id = p.session_id
+                    JOIN study_activity sa
+                        ON sa.participation_id = p.id
+                    WHERE p.user_id = u.id
+                      AND p.left_at IS NULL
+                      AND ss.end_time IS NULL
+                      AND sa.end_time IS NULL
+                      AND sa.type = 'study'
+                )
+                THEN 'studying'
+
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM participation p
+                    JOIN study_session ss
+                        ON ss.id = p.session_id
+                    JOIN study_activity sa
+                        ON sa.participation_id = p.id
+                    WHERE p.user_id = u.id
+                      AND p.left_at IS NULL
+                      AND ss.end_time IS NULL
+                      AND sa.end_time IS NULL
+                      AND sa.type = 'break'
+                )
+                THEN 'break'
+
                 ELSE 'offline'
             END AS study_status
 
@@ -162,21 +190,13 @@ const getAcceptedFriendsWithStatus = async (currentUserId) => {
               ELSE f.user_id
           END
 
-        LEFT JOIN participation p
-          ON p.user_id = u.id
-         AND p.left_at IS NULL
-
-        LEFT JOIN study_activity sa
-          ON sa.participation_id = p.id
-         AND sa.end_time IS NULL
-
         WHERE f.status = 'accepted'
           AND (f.user_id = ? OR f.friend_id = ?)
 
         ORDER BY
-            CASE
-                WHEN sa.type = 'study' THEN 1
-                WHEN sa.type = 'break' THEN 2
+            CASE study_status
+                WHEN 'studying' THEN 1
+                WHEN 'break' THEN 2
                 ELSE 3
             END,
             u.first_name,
