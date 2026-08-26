@@ -12,6 +12,8 @@ import {
   leaveStudySession,
 } from '../api';
 
+import './StudyRoomPage.css';
+
 function StudyRoomPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -77,64 +79,138 @@ function StudyRoomPage() {
     }
   };
 
+  const getMyStatusLabel = () => {
+    if (!currentActivity) return '○ NOT STARTED';
+    if (currentActivity.type === 'study') return '● STUDYING';
+    return '◐ BREAK';
+  };
+
   return (
     <>
       <AppNavbar />
 
       <main className="study-room-page">
-        <h1>Study Room</h1>
+        <section className="study-room-heading">
+          <button
+            type="button"
+            className="back-button"
+            onClick={() => navigate('/dashboard')}
+          >
+            ←
+          </button>
 
-        {error && <p>{error}</p>}
-
-        <section>
-          <h2>Participants</h2>
-
-          {participants.map((participant) => (
-            <div key={participant.participation_id}>
-              <strong>
-                {participant.first_name}{' '}
-                {participant.last_name}
-              </strong>
-            </div>
-          ))}
+          <div>
+            <h1>Study Room</h1>
+            <p>Active shared study session</p>
+          </div>
         </section>
 
-        <section>
-          <h2>Your Status</h2>
+        {error && (
+          <div className="study-room-error">
+            {error}
+          </div>
+        )}
 
-          {!currentActivity && (
-            <>
-              <p>Ready to study</p>
+        <section className="study-room-card">
+          <div className="room-header">
+            <strong>VIRTUAL STUDY ROOM</strong>
 
-              <button onClick={handleStart}>
-                ▶ START STUDYING
-              </button>
-            </>
-          )}
+            <span>
+              ♙ {participants.length}{' '}
+              {participants.length === 1
+                ? 'participant'
+                : 'participants'}
+            </span>
+          </div>
 
-          {currentActivity?.type === 'study' && (
-            <>
-              <p>● Studying</p>
+          <div className="participants-scene">
+            {participants.length === 0 ? (
+              <p>No participants.</p>
+            ) : (
+              participants.map((participant, index) => (
+                <div
+                  className="participant-desk"
+                  key={participant.participation_id}
+                >
+                  <div className="participant-character">
+                    <div className="character-head" />
+                    <div className="character-body" />
 
-              <button onClick={handleBreak}>
-                TAKE BREAK
-              </button>
-            </>
-          )}
+                    <div className="desk">
+                      <div className="desk-object laptop">
+                        ▰
+                      </div>
+                    </div>
+                  </div>
 
-          {currentActivity?.type === 'break' && (
-            <>
-              <p>◐ Break</p>
+                  <strong className="participant-name">
+                    {participant.first_name}{' '}
+                    {participant.last_name}
+                  </strong>
 
-              <button onClick={handleResume}>
-                ▶ RESUME STUDYING
-              </button>
-            </>
-          )}
+                  <span className="participant-state">
+                    {index === 0 ? 'Studying' : 'Present'}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
 
-          <button onClick={handleLeave}>
-            LEAVE SESSION
-          </button>
+          <div className="study-controls-area">
+            <div className="study-timer-box">
+              <strong className="timer-value">
+                00:00:00
+              </strong>
+
+              <span>YOUR STUDY TIME</span>
+            </div>
+
+            <div className="study-control-panel">
+              <div className="current-status">
+                {getMyStatusLabel()}
+              </div>
+
+              <div className="study-buttons">
+                {!currentActivity && (
+                  <button
+                    type="button"
+                    className="study-primary-button"
+                    onClick={handleStart}
+                  >
+                    ▶ START STUDYING
+                  </button>
+                )}
+
+                {currentActivity?.type === 'study' && (
+                  <button
+                    type="button"
+                    className="study-primary-button"
+                    onClick={handleBreak}
+                  >
+                    TAKE BREAK
+                  </button>
+                )}
+
+                {currentActivity?.type === 'break' && (
+                  <button
+                    type="button"
+                    className="study-primary-button"
+                    onClick={handleResume}
+                  >
+                    ▶ RESUME STUDYING
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="leave-session-button"
+                  onClick={handleLeave}
+                >
+                  LEAVE SESSION
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </>
