@@ -511,4 +511,8 @@
         color: #111827 !important;
         -webkit-text-fill-color: #111827 !important;
     }
+
+    .dashboard-heading-row h1 {
+        color: #ffffff;
+    }
 }
