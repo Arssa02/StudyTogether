@@ -53,15 +53,21 @@ const getActiveParticipants = async (sessionId) => {
             u.id AS user_id,
             u.first_name,
             u.last_name,
-            p.joined_at
+            p.joined_at,
+            sa.type AS activity_type
         FROM participation p
-        JOIN user u ON u.id = p.user_id
+        JOIN user u
+            ON u.id = p.user_id
+        LEFT JOIN study_activity sa
+            ON sa.participation_id = p.id
+            AND sa.end_time IS NULL
         WHERE p.session_id = ?
-          AND p.left_at IS NULL
+            AND p.left_at IS NULL
         ORDER BY p.joined_at ASC
     `;
 
     const [rows] = await db.execute(sql, [sessionId]);
+
     return rows;
 };
 

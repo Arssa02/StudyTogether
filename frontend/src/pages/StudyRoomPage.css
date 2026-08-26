@@ -238,6 +238,22 @@
   background: #f3f4f6;
 }
 
+.participant-state.studying {
+  background: #202737;
+  color: #ffffff;
+}
+
+.participant-state.break {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.participant-state.not-started {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
 @media (max-width: 800px) {
   .study-controls-area {
     grid-template-columns: 1fr;
@@ -251,3 +267,4 @@
     justify-content: flex-start;
   }
 }
+

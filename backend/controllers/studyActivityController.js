@@ -7,6 +7,12 @@ const start = async (req, res, next) => {
             Number(req.params.id)
         );
 
+        const io = req.app.get('io');
+
+        io
+            .to(`study-session-${req.params.id}`)
+            .emit('study-room-updated');
+
         return res.status(201).json({ activity });
     } catch (err) {
         if (err.statusCode) {
@@ -24,6 +30,12 @@ const takeBreak = async (req, res, next) => {
             Number(req.params.id)
         );
 
+        const io = req.app.get('io');
+
+        io
+            .to(`study-session-${req.params.id}`)
+            .emit('study-room-updated');
+
         return res.status(201).json({ activity });
     } catch (err) {
         if (err.statusCode) {
@@ -40,6 +52,12 @@ const resume = async (req, res, next) => {
             req.user.id,
             Number(req.params.id)
         );
+
+        const io = req.app.get('io');
+
+        io
+            .to(`study-session-${req.params.id}`)
+            .emit('study-room-updated');
 
         return res.status(201).json({ activity });
     } catch (err) {

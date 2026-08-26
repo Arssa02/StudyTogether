@@ -1,3 +1,5 @@
+const http = require('http');
+const { Server } = require('socket.io');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -5,6 +7,14 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 // Middleware
 app.use(cors());
@@ -39,6 +49,28 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+io.on('connection', (socket) => {
+  console.log('Socket connected:', socket.id);
+
+  socket.on('join-study-room', (sessionId) => {
+    socket.join(`study-session-${sessionId}`);
+
+    console.log(
+      `Socket ${socket.id} joined study-session-${sessionId}`
+    );
+  });
+
+  socket.on('leave-study-room', (sessionId) => {
+    socket.leave(`study-session-${sessionId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected:', socket.id);
+  });
+});
+
+app.set('io', io);
