@@ -71,8 +71,10 @@
 }
 
 .dashboard-heading-row h1 {
-    margin: 0 0 10px;
-    font-size: 32px;
+  margin: 0 0 10px;
+  font-size: 32px;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
 }
 
 .week-label {
@@ -512,7 +514,4 @@
         -webkit-text-fill-color: #111827 !important;
     }
 
-    .dashboard-heading-row h1 {
-        color: #ffffff;
-    }
 }
