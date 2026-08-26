@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../api';
+import { Link } from 'react-router-dom';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -50,6 +51,10 @@ function DashboardPage() {
       <button onClick={handleLogout}>
         Logout
       </button>
+
+      <p>
+        <Link to="/profile">Open Profile</Link>
+      </p>
     </main>
   );
 }
