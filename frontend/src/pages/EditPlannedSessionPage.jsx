@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import {
   getMyPlannedSessions,
   updatePlannedSession,
@@ -87,9 +88,7 @@ function EditPlannedSessionPage() {
           <input
             type="text"
             value={title}
-            onChange={(event) =>
-              setTitle(event.target.value)
-            }
+            onChange={(event) => setTitle(event.target.value)}
             required
           />
         </label>
@@ -99,9 +98,7 @@ function EditPlannedSessionPage() {
           <input
             type="datetime-local"
             value={startTime}
-            onChange={(event) =>
-              setStartTime(event.target.value)
-            }
+            onChange={(event) => setStartTime(event.target.value)}
             required
           />
         </label>
@@ -111,9 +108,7 @@ function EditPlannedSessionPage() {
           <input
             type="datetime-local"
             value={endTime}
-            onChange={(event) =>
-              setEndTime(event.target.value)
-            }
+            onChange={(event) => setEndTime(event.target.value)}
             required
           />
         </label>
