@@ -8,6 +8,8 @@ import DashboardPage from './pages/DashboardPage';
 import SessionsPage from './pages/SessionsPage';
 import PlanSessionPage from './pages/PlanSessionPage';
 import EditPlannedSessionPage from './pages/EditPlannedSessionPage';
+import StartStudyingPage from './pages/StartStudyingPage';
+import StudyRoomPage from './pages/StudyRoomPage';
 
 function App() {
   return (
@@ -64,6 +66,24 @@ function App() {
         element={
           <ProtectedRoute>
             <EditPlannedSessionPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/start-studying"
+        element={
+          <ProtectedRoute>
+            <StartStudyingPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/study-room/:id"
+        element={
+          <ProtectedRoute>
+            <StudyRoomPage />
           </ProtectedRoute>
         }
       />

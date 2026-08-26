@@ -76,3 +76,37 @@ export const getFriendPlannedSessions = (friendId) =>
 
 export const getFriends = () =>
   apiRequest('/friends');
+
+export const startStudySession = (title) =>
+  apiRequest('/study-sessions', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: title?.trim() || null,
+    }),
+  });
+
+export const getSessionParticipants = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/participants`);
+
+export const startStudying = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/activity/start`, {
+    method: 'POST',
+  });
+
+export const takeBreak = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/activity/break`, {
+    method: 'POST',
+  });
+
+export const resumeStudying = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/activity/resume`, {
+    method: 'POST',
+  });
+
+export const getMyStudyActivity = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/activity/me`);
+
+export const leaveStudySession = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/leave`, {
+    method: 'POST',
+  });
