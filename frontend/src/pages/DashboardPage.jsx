@@ -12,7 +12,14 @@ import {
 
 import './DashboardPage.css';
 
-const HOURS = [9, 12, 15, 18, 21];
+const CALENDAR_START_HOUR = 0;
+const CALENDAR_END_HOUR = 24;
+const DAY_MINUTES = 24 * 60;
+
+const HOURS = Array.from(
+  { length: 25 },
+  (_, index) => index
+);
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -108,6 +115,82 @@ function DashboardPage() {
     dateA.getFullYear() === dateB.getFullYear() &&
     dateA.getMonth() === dateB.getMonth() &&
     dateA.getDate() === dateB.getDate();
+
+  const getDayStart = (date) => {
+    const result = new Date(date);
+    result.setHours(0, 0, 0, 0);
+    return result;
+  };
+
+  const getNextDayStart = (date) => {
+    const result = getDayStart(date);
+    result.setDate(result.getDate() + 1);
+    return result;
+  };
+
+  const getIntervalForDay = (startDate, endDate, day) => {
+    const dayStart = getDayStart(day);
+    const nextDayStart = getNextDayStart(day);
+
+    const visibleStart = new Date(
+      Math.max(startDate.getTime(), dayStart.getTime())
+    );
+
+    const visibleEnd = new Date(
+      Math.min(endDate.getTime(), nextDayStart.getTime())
+    );
+
+    if (visibleStart >= visibleEnd) {
+      return null;
+    }
+
+    return {
+      start: visibleStart,
+      end: visibleEnd,
+    };
+  };
+
+  const getMinutesFromMidnight = (date) =>
+    date.getHours() * 60 + date.getMinutes();
+
+  const getCalendarPosition = (startDate, endDate, day) => {
+    const dayStart = getDayStart(day);
+    const nextDayStart = getNextDayStart(day);
+
+    const clippedStart = new Date(
+      Math.max(startDate.getTime(), dayStart.getTime())
+    );
+
+    const clippedEnd = new Date(
+      Math.min(endDate.getTime(), nextDayStart.getTime())
+    );
+
+    const startMinutes =
+      getMinutesFromMidnight(clippedStart);
+
+    const endMinutes =
+      clippedEnd.getTime() === nextDayStart.getTime()
+        ? DAY_MINUTES
+        : getMinutesFromMidnight(clippedEnd);
+
+    return {
+      top: `${(startMinutes / DAY_MINUTES) * 100}%`,
+      height: `${((endMinutes - startMinutes) / DAY_MINUTES) * 100}%`,
+    };
+  };
+
+  const formatTime = (date) =>
+    date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+  const formatHour = (hour) => {
+    if (hour === 0 || hour === 24) return '12AM';
+    if (hour < 12) return `${hour}AM`;
+    if (hour === 12) return '12PM';
+    return `${hour - 12}PM`;
+  };
 
   const overlaps = useMemo(() => {
     const result = [];
@@ -274,62 +357,167 @@ function DashboardPage() {
             </div>
 
             <div className="calendar-grid">
-              <div className="calendar-corner" />
+              <div className="calendar-scroll">
+                <div className="precise-calendar">
+                  <div className="calendar-time-column">
+                    <div className="calendar-time-header" />
 
-              {weekDates.map((date) => (
-                <div
-                  className="calendar-day-header"
-                  key={date.toISOString()}
-                >
-                  <strong>
-                    {date
-                      .toLocaleDateString(undefined, {
-                        weekday: 'short',
-                      })
-                      .toUpperCase()}
-                  </strong>
-
-                  <span>{date.getDate()}</span>
-                </div>
-              ))}
-
-              {HOURS.map((hour) => (
-                <div
-                  className="calendar-row"
-                  key={hour}
-                >
-                  <div className="calendar-time">
-                    {hour > 12 ? hour - 12 : hour}
-                    {hour >= 12 ? 'PM' : 'AM'}
+                    <div className="calendar-time-body">
+                      {HOURS.map((hour) => (
+                        <div
+                          key={hour}
+                          className="calendar-hour-label"
+                          style={{
+                            top: `${(hour / 24) * 100}%`,
+                          }}
+                        >
+                          {formatHour(hour)}
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   {weekDates.map((date) => {
-                    const session =
-                      getSessionForCell(date, hour);
+                    const myDaySessions = mySessions
+                      .map((session) => {
+                        const start = new Date(session.start_time);
+                        const end = new Date(session.end_time);
+
+                        const interval = getIntervalForDay(
+                          start,
+                          end,
+                          date
+                        );
+
+                        return interval
+                          ? { session, start, end }
+                          : null;
+                      })
+                      .filter(Boolean);
+
+                    const friendDaySessions = friendSessions
+                      .map((session) => {
+                        const start = new Date(session.start_time);
+                        const end = new Date(session.end_time);
+
+                        const interval = getIntervalForDay(
+                          start,
+                          end,
+                          date
+                        );
+
+                        return interval
+                          ? { session, start, end }
+                          : null;
+                      })
+                      .filter(Boolean);
+
+                    const dayOverlaps = overlaps.filter((overlap) =>
+                      getIntervalForDay(
+                        overlap.start,
+                        overlap.end,
+                        date
+                      )
+                    );
 
                     return (
                       <div
-                        className="calendar-cell"
-                        key={`${date.toISOString()}-${hour}`}
+                        className="precise-day-column"
+                        key={date.toISOString()}
                       >
-                        {session && (
-                          <div
-                            className={`calendar-session ${session.type}`}
-                          >
-                            <strong>
-                              {session.title}
-                            </strong>
+                        <div className="precise-day-header">
+                          <strong>
+                            {date
+                              .toLocaleDateString(undefined, {
+                                weekday: 'short',
+                              })
+                              .toUpperCase()}
+                          </strong>
 
-                            <span>
-                              {session.subtitle}
-                            </span>
-                          </div>
-                        )}
+                          <span>{date.getDate()}</span>
+                        </div>
+
+                        <div className="precise-day-body">
+                          {HOURS.map((hour) => (
+                            <div
+                              key={hour}
+                              className="calendar-hour-line"
+                              style={{
+                                top: `${(hour / 24) * 100}%`,
+                              }}
+                            />
+                          ))}
+
+                          {myDaySessions.map(
+                            ({ session, start, end }) => (
+                              <div
+                                key={`mine-${session.id}`}
+                                className="precise-session mine"
+                                style={getCalendarPosition(
+                                  start,
+                                  end,
+                                  date
+                                )}
+                              >
+                                <strong>{session.title}</strong>
+
+                                <span>
+                                  {formatTime(start)}–{formatTime(end)}
+                                </span>
+
+                                <small>YOU</small>
+                              </div>
+                            )
+                          )}
+
+                          {friendDaySessions.map(
+                            ({ session, start, end }) => (
+                              <div
+                                key={`friend-${session.id}`}
+                                className="precise-session friend"
+                                style={getCalendarPosition(
+                                  start,
+                                  end,
+                                  date
+                                )}
+                              >
+                                <strong>{session.title}</strong>
+
+                                <span>
+                                  {formatTime(start)}–{formatTime(end)}
+                                </span>
+
+                                <small>
+                                  {selectedFriend?.firstName || 'FRIEND'}
+                                </small>
+                              </div>
+                            )
+                          )}
+
+                          {dayOverlaps.map((overlap, index) => (
+                            <div
+                              key={`overlap-${index}`}
+                              className="precise-session overlap"
+                              style={getCalendarPosition(
+                                overlap.start,
+                                overlap.end,
+                                date
+                              )}
+                            >
+                              <strong>BOTH</strong>
+
+                              <span>
+                                {formatTime(overlap.start)}–
+                                {formatTime(overlap.end)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
-              ))}
+              </div>
             </div>
 
             <div className="calendar-legend">
@@ -380,32 +568,27 @@ function DashboardPage() {
                     <button
                       type="button"
                       key={friend.friendshipId}
-                      className={`friend-row ${
-                        selectedFriend?.id === friend.id
+                      className={`friend-row ${selectedFriend?.id === friend.id
                           ? 'selected'
                           : ''
-                      }`}
-                      onClick={() =>
-                        handleSelectFriend(friend)
-                      }
+                        }`}
+                      onClick={() => handleSelectFriend(friend)}
                     >
-                      <span
-                        className={statusClass(
-                          friend.studyStatus
-                        )}
-                      >
-                        {statusLabel(
-                          friend.studyStatus
-                        )}
-                      </span>
+                      <div className="friend-identity">
+                        <strong className="friend-name">
+                          {friend.firstName} {friend.lastName}
+                        </strong>
 
-                      <strong>
-                        {friend.firstName}{' '}
-                        {friend.lastName}
-                      </strong>
+                        <span
+                          className={`friend-status ${statusClass(
+                            friend.studyStatus
+                          )}`}
+                        >
+                          {statusLabel(friend.studyStatus)}
+                        </span>
+                      </div>
 
-                      {selectedFriend?.id ===
-                        friend.id && (
+                      {selectedFriend?.id === friend.id && (
                         <span className="selected-check">
                           ✓
                         </span>
