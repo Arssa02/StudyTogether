@@ -1,0 +1,411 @@
+.app-navbar {
+  border-bottom: 1px solid #d7dbe3;
+  background: #ffffff;
+}
+
+.navbar-inner {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.app-brand {
+  border: 2px solid #1d2433;
+  padding: 12px 18px;
+  color: #111827;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.main-navigation {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-button,
+.logout-button {
+  border: 1px solid #bcc3ce;
+  background: #ffffff;
+  padding: 11px 18px;
+  color: #202737;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-button.active {
+  background: #1e2430;
+  color: white;
+  border-color: #1e2430;
+}
+
+.logout-button {
+  margin-left: auto;
+}
+
+.dashboard-page {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 30px 0 60px;
+  color: #1f2937;
+}
+
+.dashboard-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 26px;
+}
+
+.dashboard-heading-row h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+}
+
+.week-label {
+  margin: 0;
+  color: #6b7280;
+}
+
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.primary-action,
+.secondary-action,
+.small-outline-button,
+.manage-friends-button {
+  padding: 11px 16px;
+  border: 1px solid #9ba3af;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-action {
+  color: white;
+  background: #202737;
+  border-color: #202737;
+}
+
+.secondary-action,
+.small-outline-button,
+.manage-friends-button {
+  background: #ffffff;
+  color: #202737;
+}
+
+.dashboard-error {
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  border: 1px solid #dc2626;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 22px;
+}
+
+.calendar-card,
+.sidebar-box {
+  background: white;
+  border: 2px solid #202737;
+}
+
+.calendar-card {
+  padding: 24px;
+}
+
+.calendar-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.calendar-card-header h2,
+.sidebar-box h2 {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 18px;
+}
+
+.calendar-card-header p,
+.sidebar-description {
+  color: #697386;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.calendar-grid {
+  border-left: 1px solid #ccd1d8;
+  border-top: 1px solid #ccd1d8;
+  overflow: hidden;
+}
+
+.calendar-corner,
+.calendar-day-header,
+.calendar-time,
+.calendar-cell {
+  border-right: 1px solid #ccd1d8;
+  border-bottom: 1px solid #ccd1d8;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 78px repeat(7, minmax(85px, 1fr));
+}
+
+.calendar-corner {
+  min-height: 50px;
+}
+
+.calendar-day-header {
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  gap: 3px;
+}
+
+.calendar-day-header span {
+  color: #8a93a0;
+}
+
+.calendar-row {
+  display: contents;
+}
+
+.calendar-time {
+  min-height: 72px;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.calendar-cell {
+  min-height: 72px;
+  padding: 6px;
+}
+
+.calendar-session {
+  height: 100%;
+  min-height: 54px;
+  padding: 7px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.calendar-session strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.calendar-session span {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.calendar-session.mine {
+  border: 2px solid #2d3748;
+  background: white;
+}
+
+.calendar-session.friend {
+  border: 2px dashed #7b8491;
+  background: #f4f5f7;
+}
+
+.calendar-session.overlap {
+  border: 2px solid #202737;
+  background: #303744;
+  color: white;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.calendar-legend > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-box {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
+
+.legend-box.mine {
+  border: 2px solid #202737;
+  background: white;
+}
+
+.legend-box.friend {
+  border: 2px dashed #7b8491;
+  background: #f4f5f7;
+}
+
+.legend-box.overlap {
+  border: 2px solid #202737;
+  background: #303744;
+}
+
+.dashboard-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.sidebar-box {
+  padding: 18px;
+}
+
+.sidebar-box h2 {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+}
+
+.friends-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.friend-row {
+  display: grid;
+  grid-template-columns: 78px 1fr 18px;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  background: white;
+  border: 1px solid #c9ced6;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.friend-row.selected {
+  border: 2px solid #202737;
+}
+
+.friend-row strong {
+  font-size: 13px;
+}
+
+.friend-row > span:first-child {
+  font-size: 10px;
+}
+
+.status-studying {
+  color: #111827;
+}
+
+.status-break {
+  color: #687386;
+}
+
+.status-offline {
+  color: #9aa1ac;
+}
+
+.selected-check {
+  font-weight: bold;
+}
+
+.status-legend {
+  margin: 14px 0;
+  padding-top: 12px;
+  border-top: 1px solid #d1d5db;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  font-size: 10px;
+  color: #596273;
+}
+
+.manage-friends-button {
+  width: 100%;
+}
+
+.dashboard-loading {
+  padding: 40px;
+}
+
+@media (max-width: 950px) {
+  .navbar-inner {
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  .logout-button {
+    margin-left: 0;
+  }
+
+  .dashboard-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calendar-card {
+    overflow-x: auto;
+  }
+
+  .calendar-grid {
+    min-width: 820px;
+  }
+}
+
+@media (max-width: 650px) {
+  .main-navigation {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-actions {
+    width: 100%;
+  }
+
+  .dashboard-actions button {
+    flex: 1;
+  }
+}

@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import AppNavbar from '../components/AppNavbar';
 
 import {
   getCurrentUser,
@@ -7,6 +9,10 @@ import {
   getMyPlannedSessions,
   getFriendPlannedSessions,
 } from '../api';
+
+import './DashboardPage.css';
+
+const HOURS = [9, 12, 15, 18, 21];
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -60,19 +66,51 @@ function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
-  const getStatusLabel = (status) => {
+  const statusLabel = (status) => {
     if (status === 'studying') return '● Studying';
     if (status === 'break') return '◐ Break';
     return '○ Offline';
   };
 
-  const getOverlaps = () => {
-    const overlaps = [];
+  const statusClass = (status) => {
+    if (status === 'studying') return 'status-studying';
+    if (status === 'break') return 'status-break';
+    return 'status-offline';
+  };
+
+  const weekDates = useMemo(() => {
+    const today = new Date();
+
+    const day = today.getDay();
+    const distanceToMonday = day === 0 ? -6 : 1 - day;
+
+    const monday = new Date(today);
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(today.getDate() + distanceToMonday);
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + index);
+      return date;
+    });
+  }, []);
+
+  const weekStart = weekDates[0];
+  const weekEnd = weekDates[6];
+
+  const formatShortDate = (date) =>
+    date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+
+  const isSameDay = (dateA, dateB) =>
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate();
+
+  const overlaps = useMemo(() => {
+    const result = [];
 
     for (const mine of mySessions) {
       for (const theirs of friendSessions) {
@@ -82,161 +120,319 @@ function DashboardPage() {
         const theirStart = new Date(theirs.start_time);
         const theirEnd = new Date(theirs.end_time);
 
-        const overlapStart = new Date(
+        const start = new Date(
           Math.max(myStart.getTime(), theirStart.getTime())
         );
 
-        const overlapEnd = new Date(
+        const end = new Date(
           Math.min(myEnd.getTime(), theirEnd.getTime())
         );
 
-        if (overlapStart < overlapEnd) {
-          overlaps.push({
-            mySession: mine,
-            friendSession: theirs,
-            start: overlapStart,
-            end: overlapEnd,
+        if (start < end) {
+          result.push({
+            mine,
+            theirs,
+            start,
+            end,
           });
         }
       }
     }
 
-    return overlaps;
+    return result;
+  }, [mySessions, friendSessions]);
+
+  const getSessionForCell = (date, hour) => {
+    const overlap = overlaps.find((item) => {
+      const overlapDate = item.start;
+
+      return (
+        isSameDay(overlapDate, date) &&
+        overlapDate.getHours() >= hour &&
+        overlapDate.getHours() < hour + 3
+      );
+    });
+
+    if (overlap) {
+      return {
+        type: 'overlap',
+        title: overlap.mine.title,
+        subtitle: 'BOTH',
+      };
+    }
+
+    const mine = mySessions.find((session) => {
+      const start = new Date(session.start_time);
+
+      return (
+        isSameDay(start, date) &&
+        start.getHours() >= hour &&
+        start.getHours() < hour + 3
+      );
+    });
+
+    if (mine) {
+      return {
+        type: 'mine',
+        title: mine.title,
+        subtitle: 'YOU',
+      };
+    }
+
+    const theirs = friendSessions.find((session) => {
+      const start = new Date(session.start_time);
+
+      return (
+        isSameDay(start, date) &&
+        start.getHours() >= hour &&
+        start.getHours() < hour + 3
+      );
+    });
+
+    if (theirs) {
+      return {
+        type: 'friend',
+        title: theirs.title,
+        subtitle: selectedFriend?.firstName || 'FRIEND',
+      };
+    }
+
+    return null;
   };
 
-  const overlaps = getOverlaps();
-
   if (!user) {
-    return <p>Loading...</p>;
+    return <p className="dashboard-loading">Loading...</p>;
   }
 
   return (
-    <main>
-      <h1>Dashboard</h1>
+    <>
+      <AppNavbar />
 
-      <p>
-        Welcome, {user.firstName} {user.lastName}
-      </p>
+      <main className="dashboard-page">
+        <section className="dashboard-heading-row">
+          <div>
+            <h1>Dashboard</h1>
 
-      <p>{user.email}</p>
+            <p className="week-label">
+              Week of {formatShortDate(weekStart)} –{' '}
+              {formatShortDate(weekEnd)}, {weekEnd.getFullYear()}
+            </p>
+          </div>
 
-      <nav>
-        <Link to="/plan-session">+ Plan Session</Link>
-        {' | '}
-        <Link to="/sessions">Study Sessions</Link>
-        {' | '}
-        <Link to="/profile">Profile</Link>
-      </nav>
-
-      <hr />
-
-      {error && <p>{error}</p>}
-
-      <section>
-        <h2>My Planned Sessions</h2>
-
-        {mySessions.length === 0 ? (
-          <p>No planned sessions.</p>
-        ) : (
-          mySessions.map((session) => (
-            <article key={session.id}>
-              <strong>{session.title}</strong>
-
-              <p>
-                {new Date(session.start_time).toLocaleString()}
-                {' → '}
-                {new Date(session.end_time).toLocaleString()}
-              </p>
-            </article>
-          ))
-        )}
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Friends</h2>
-
-        {friends.length === 0 ? (
-          <p>No friends yet.</p>
-        ) : (
-          friends.map((friend) => (
+          <div className="dashboard-actions">
             <button
-              key={friend.friendshipId}
-              onClick={() => handleSelectFriend(friend)}
+              type="button"
+              className="secondary-action"
+              onClick={() => navigate('/plan-session')}
             >
-              {friend.firstName} {friend.lastName}
-              {' — '}
-              {getStatusLabel(friend.studyStatus)}
+              + PLAN SESSION
             </button>
-          ))
+
+            <button
+              type="button"
+              className="primary-action"
+              onClick={() => navigate('/start-studying')}
+            >
+              ▶ START STUDYING
+            </button>
+
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => navigate('/sessions')}
+            >
+              VIEW ALL SESSIONS
+            </button>
+          </div>
+        </section>
+
+        {error && (
+          <div className="dashboard-error">
+            {error}
+          </div>
         )}
-      </section>
 
-      {selectedFriend && (
-        <>
-          <hr />
+        <section className="dashboard-layout">
+          <div className="calendar-card">
+            <div className="calendar-card-header">
+              <div>
+                <h2>Weekly Calendar</h2>
 
-          <section>
-            <h2>
-              {selectedFriend.firstName}'s Planned Sessions
-            </h2>
+                <p>
+                  {selectedFriend
+                    ? `Comparing your schedule with ${selectedFriend.firstName} ${selectedFriend.lastName}`
+                    : 'Select a friend to compare planned study times'}
+                </p>
+              </div>
 
-            {friendSessions.length === 0 ? (
-              <p>No planned sessions.</p>
-            ) : (
-              friendSessions.map((session) => (
-                <article key={session.id}>
-                  <strong>{session.title}</strong>
+              <button
+                type="button"
+                className="small-outline-button"
+              >
+                DAY VIEW
+              </button>
+            </div>
 
-                  <p>
-                    {new Date(session.start_time).toLocaleString()}
-                    {' → '}
-                    {new Date(session.end_time).toLocaleString()}
-                  </p>
-                </article>
-              ))
-            )}
-          </section>
+            <div className="calendar-grid">
+              <div className="calendar-corner" />
 
-          <hr />
+              {weekDates.map((date) => (
+                <div
+                  className="calendar-day-header"
+                  key={date.toISOString()}
+                >
+                  <strong>
+                    {date
+                      .toLocaleDateString(undefined, {
+                        weekday: 'short',
+                      })
+                      .toUpperCase()}
+                  </strong>
 
-          <section>
-            <h2>Overlapping Study Times</h2>
+                  <span>{date.getDate()}</span>
+                </div>
+              ))}
 
-            {overlaps.length === 0 ? (
-              <p>No overlapping planned study times.</p>
-            ) : (
-              overlaps.map((overlap, index) => (
-                <article key={index}>
-                  <p>
-                    <strong>
-                      {overlap.mySession.title}
-                    </strong>
-                    {' + '}
-                    <strong>
-                      {overlap.friendSession.title}
-                    </strong>
-                  </p>
+              {HOURS.map((hour) => (
+                <div
+                  className="calendar-row"
+                  key={hour}
+                >
+                  <div className="calendar-time">
+                    {hour > 12 ? hour - 12 : hour}
+                    {hour >= 12 ? 'PM' : 'AM'}
+                  </div>
 
-                  <p>
-                    {overlap.start.toLocaleString()}
-                    {' → '}
-                    {overlap.end.toLocaleString()}
-                  </p>
-                </article>
-              ))
-            )}
-          </section>
-        </>
-      )}
+                  {weekDates.map((date) => {
+                    const session =
+                      getSessionForCell(date, hour);
 
-      <hr />
+                    return (
+                      <div
+                        className="calendar-cell"
+                        key={`${date.toISOString()}-${hour}`}
+                      >
+                        {session && (
+                          <div
+                            className={`calendar-session ${session.type}`}
+                          >
+                            <strong>
+                              {session.title}
+                            </strong>
 
-      <button onClick={handleLogout}>
-        Logout
-      </button>
-    </main>
+                            <span>
+                              {session.subtitle}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            <div className="calendar-legend">
+              <div>
+                <span className="legend-box mine" />
+                My Planned Session
+              </div>
+
+              <div>
+                <span className="legend-box friend" />
+                Friend's Planned Session
+              </div>
+
+              <div>
+                <span className="legend-box overlap" />
+                Overlapping Study Time
+              </div>
+            </div>
+          </div>
+
+          <aside className="dashboard-sidebar">
+            <section className="sidebar-box">
+              <h2>Today's Stats</h2>
+
+              <div className="stats-row">
+                <span>Study Time</span>
+                <strong>—</strong>
+              </div>
+
+              <div className="stats-row">
+                <span>Sessions</span>
+                <strong>—</strong>
+              </div>
+            </section>
+
+            <section className="sidebar-box friends-box">
+              <h2>Friends</h2>
+
+              <p className="sidebar-description">
+                Select to compare schedules
+              </p>
+
+              <div className="friends-list">
+                {friends.length === 0 ? (
+                  <p>No friends yet.</p>
+                ) : (
+                  friends.map((friend) => (
+                    <button
+                      type="button"
+                      key={friend.friendshipId}
+                      className={`friend-row ${
+                        selectedFriend?.id === friend.id
+                          ? 'selected'
+                          : ''
+                      }`}
+                      onClick={() =>
+                        handleSelectFriend(friend)
+                      }
+                    >
+                      <span
+                        className={statusClass(
+                          friend.studyStatus
+                        )}
+                      >
+                        {statusLabel(
+                          friend.studyStatus
+                        )}
+                      </span>
+
+                      <strong>
+                        {friend.firstName}{' '}
+                        {friend.lastName}
+                      </strong>
+
+                      {selectedFriend?.id ===
+                        friend.id && (
+                        <span className="selected-check">
+                          ✓
+                        </span>
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+
+              <div className="status-legend">
+                <span>● Studying</span>
+                <span>◐ Break</span>
+                <span>○ Offline</span>
+              </div>
+
+              <button
+                type="button"
+                className="manage-friends-button"
+                onClick={() => navigate('/profile')}
+              >
+                MANAGE FRIENDS
+              </button>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </>
   );
 }
 
