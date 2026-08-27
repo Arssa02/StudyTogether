@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import {
   apiRequest,
   getCurrentUser,
@@ -7,23 +8,29 @@ import {
 } from '../api';
 
 import AppNavbar from '../components/AppNavbar';
+import socket, { connectSocket } from '../socket';
+
 import './ProfilePage.css';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
+
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [friendEmail, setFriendEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
 
   const [stats, setStats] = useState({
     totalStudySeconds: 0,
     sessionsCompleted: 0,
   });
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+
+  const [friendEmail, setFriendEmail] = useState('');
+
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const loadProfileData = async () => {
     try {
@@ -42,9 +49,11 @@ function ProfilePage() {
       ]);
 
       setUser(userResult.user);
+
       setFirstName(userResult.user.firstName);
       setLastName(userResult.user.lastName);
       setEmail(userResult.user.email);
+
       setFriends(friendsResult.friends);
       setRequests(requestsResult.requests);
       setStats(statsResult.stats);
@@ -55,6 +64,34 @@ function ProfilePage() {
 
   useEffect(() => {
     loadProfileData();
+  }, []);
+
+  // Real-time friend status updates on Profile
+  useEffect(() => {
+    connectSocket();
+
+    const handleFriendStatusUpdate = async () => {
+      try {
+        const result = await apiRequest('/friends');
+        setFriends(result.friends);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    socket.on(
+      'friend-status-updated',
+      handleFriendStatusUpdate
+    );
+
+    return () => {
+      socket.off(
+        'friend-status-updated',
+        handleFriendStatusUpdate
+      );
+
+      socket.disconnect();
+    };
   }, []);
 
   const handleSaveProfile = async (event) => {
@@ -86,7 +123,9 @@ function ProfilePage() {
 
       await apiRequest('/friends/requests', {
         method: 'POST',
-        body: JSON.stringify({ email: friendEmail }),
+        body: JSON.stringify({
+          email: friendEmail,
+        }),
       });
 
       setFriendEmail('');
@@ -98,10 +137,17 @@ function ProfilePage() {
 
   const handleAccept = async (requestId) => {
     try {
-      await apiRequest(`/friends/requests/${requestId}/accept`, {
-        method: 'PATCH',
-      });
+      setError('');
+      setMessage('');
 
+      await apiRequest(
+        `/friends/requests/${requestId}/accept`,
+        {
+          method: 'PATCH',
+        }
+      );
+
+      setMessage('Friend request accepted.');
       await loadProfileData();
     } catch (err) {
       setError(err.message);
@@ -110,10 +156,17 @@ function ProfilePage() {
 
   const handleDecline = async (requestId) => {
     try {
-      await apiRequest(`/friends/requests/${requestId}`, {
-        method: 'DELETE',
-      });
+      setError('');
+      setMessage('');
 
+      await apiRequest(
+        `/friends/requests/${requestId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      setMessage('Friend request declined.');
       await loadProfileData();
     } catch (err) {
       setError(err.message);
@@ -122,10 +175,14 @@ function ProfilePage() {
 
   const handleRemoveFriend = async (friendshipId) => {
     try {
+      setError('');
+      setMessage('');
+
       await apiRequest(`/friends/${friendshipId}`, {
         method: 'DELETE',
       });
 
+      setMessage('Friend removed.');
       await loadProfileData();
     } catch (err) {
       setError(err.message);
@@ -133,17 +190,33 @@ function ProfilePage() {
   };
 
   const statusLabel = (status) => {
-    if (status === 'studying') return '● Studying';
-    if (status === 'break') return '◐ Break';
+    if (status === 'studying') {
+      return '● Studying';
+    }
+
+    if (status === 'break') {
+      return '◐ Break';
+    }
+
     return '○ Offline';
   };
 
-  if (!user) {
-    return <p>Loading...</p>;
-  }
+  const statusClass = (status) => {
+    if (status === 'studying') {
+      return 'studying';
+    }
+
+    if (status === 'break') {
+      return 'break';
+    }
+
+    return 'offline';
+  };
 
   const formatStudyTime = (totalSeconds) => {
-    const hours = Math.floor(totalSeconds / 3600);
+    const hours = Math.floor(
+      totalSeconds / 3600
+    );
 
     const minutes = Math.floor(
       (totalSeconds % 3600) / 60
@@ -156,155 +229,282 @@ function ProfilePage() {
     return `${hours}h ${minutes}m`;
   };
 
+  if (!user) {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <main className="profile-page">
-      <h1>Profile</h1>
+    <>
+      <AppNavbar />
 
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
+      <main className="profile-page">
+        <header className="profile-heading">
+          <h1>Profile</h1>
 
-      <section>
-        <h2>User Information</h2>
+          <p>
+            Manage your account, study statistics,
+            and friends.
+          </p>
+        </header>
 
-        <form onSubmit={handleSaveProfile}>
-          <label>
-            First Name
-            <input
-              type="text"
-              value={firstName}
-              onChange={(event) =>
-                setFirstName(event.target.value)
-              }
-              required
-            />
-          </label>
+        {error && (
+          <div className="profile-message error">
+            {error}
+          </div>
+        )}
 
-          <label>
-            Last Name
-            <input
-              type="text"
-              value={lastName}
-              onChange={(event) =>
-                setLastName(event.target.value)
-              }
-              required
-            />
-          </label>
+        {message && (
+          <div className="profile-message success">
+            {message}
+          </div>
+        )}
 
-          <label>
-            Email
-            <input
-              type="email"
-              value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-              required
-            />
-          </label>
+        <section className="profile-card">
+          <div className="profile-card-header">
+            <h2>USER INFORMATION</h2>
+          </div>
 
-          <button type="submit">
-            Save Changes
-          </button>
-        </form>
-      </section>
+          <form
+            className="profile-form"
+            onSubmit={handleSaveProfile}
+          >
+            <div className="profile-form-grid">
+              <label>
+                <span>First Name</span>
 
-      <section>
-        <h2>Study Statistics</h2>
-        <p>
-          Total study time:{' '}
-          {formatStudyTime(stats.totalStudySeconds)}
-        </p>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(event) =>
+                    setFirstName(event.target.value)
+                  }
+                  required
+                />
+              </label>
 
-        <p>
-          Sessions completed:{' '}
-          {stats.sessionsCompleted}
-        </p>
+              <label>
+                <span>Last Name</span>
 
-        <p>
-          Friends: {friends.length}
-        </p>
-      </section>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(event) =>
+                    setLastName(event.target.value)
+                  }
+                  required
+                />
+              </label>
 
-      <section>
-        <h2>Add Friend by Email</h2>
+              <label>
+                <span>Email</span>
 
-        <form onSubmit={handleSendRequest}>
-          <input
-            type="email"
-            placeholder="friend@example.com"
-            value={friendEmail}
-            onChange={(event) =>
-              setFriendEmail(event.target.value)
-            }
-            required
-          />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) =>
+                    setEmail(event.target.value)
+                  }
+                  required
+                />
+              </label>
+            </div>
 
-          <button type="submit">
-            Send Request
-          </button>
-        </form>
-      </section>
+            <button
+              type="submit"
+              className="profile-primary-button"
+            >
+              SAVE CHANGES
+            </button>
+          </form>
+        </section>
 
-      <section>
-        <h2>Friend Requests</h2>
+        <section className="profile-card">
+          <div className="profile-card-header">
+            <h2>STUDY STATS</h2>
+          </div>
 
-        {requests.length === 0 ? (
-          <p>No pending friend requests.</p>
-        ) : (
-          requests.map((request) => (
-            <div key={request.id}>
+          <div className="stats-grid">
+            <div className="profile-stat">
               <strong>
-                {request.requester.firstName}{' '}
-                {request.requester.lastName}
+                {formatStudyTime(
+                  stats.totalStudySeconds
+                )}
               </strong>
 
-              <p>{request.requester.email}</p>
-
-              <button
-                onClick={() => handleAccept(request.id)}
-              >
-                Accept
-              </button>
-
-              <button
-                onClick={() => handleDecline(request.id)}
-              >
-                Decline
-              </button>
+              <span>TOTAL STUDY TIME</span>
             </div>
-          ))
-        )}
-      </section>
 
-      <section>
-        <h2>Friends</h2>
-
-        {friends.length === 0 ? (
-          <p>No friends yet.</p>
-        ) : (
-          friends.map((friend) => (
-            <div key={friend.friendshipId}>
+            <div className="profile-stat">
               <strong>
-                {friend.firstName} {friend.lastName}
+                {stats.sessionsCompleted}
               </strong>
 
-              <p>{friend.email}</p>
-
-              <p>{statusLabel(friend.studyStatus)}</p>
-
-              <button
-                onClick={() =>
-                  handleRemoveFriend(friend.friendshipId)
-                }
-              >
-                Remove
-              </button>
+              <span>SESSIONS COMPLETED</span>
             </div>
-          ))
-        )}
-      </section>
-    </main>
+
+            <div className="profile-stat">
+              <strong>
+                {friends.length}
+              </strong>
+
+              <span>FRIENDS</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="profile-card">
+          <div className="profile-card-header">
+            <h2>FRIENDS LIST</h2>
+          </div>
+
+          <div className="friends-management">
+            <section className="profile-subsection">
+              <h3>ADD FRIEND BY EMAIL</h3>
+
+              <form
+                className="add-friend-form"
+                onSubmit={handleSendRequest}
+              >
+                <input
+                  type="email"
+                  placeholder="friend@example.com"
+                  value={friendEmail}
+                  onChange={(event) =>
+                    setFriendEmail(
+                      event.target.value
+                    )
+                  }
+                  required
+                />
+
+                <button
+                  type="submit"
+                  className="profile-primary-button"
+                >
+                  SEND REQUEST
+                </button>
+              </form>
+            </section>
+
+            <section className="profile-subsection">
+              <h3>
+                FRIEND REQUESTS ({requests.length})
+              </h3>
+
+              {requests.length === 0 ? (
+                <div className="empty-profile-row">
+                  No pending friend requests.
+                </div>
+              ) : (
+                <div className="profile-list">
+                  {requests.map((request) => (
+                    <article
+                      className="profile-list-row"
+                      key={request.id}
+                    >
+                      <div>
+                        <strong>
+                          {
+                            request.requester
+                              .firstName
+                          }{' '}
+                          {
+                            request.requester
+                              .lastName
+                          }
+                        </strong>
+
+                        <span>
+                          {request.requester.email}
+                        </span>
+                      </div>
+
+                      <div className="request-actions">
+                        <button
+                          type="button"
+                          className="profile-primary-button small"
+                          onClick={() =>
+                            handleAccept(
+                              request.id
+                            )
+                          }
+                        >
+                          ACCEPT
+                        </button>
+
+                        <button
+                          type="button"
+                          className="profile-secondary-button small"
+                          onClick={() =>
+                            handleDecline(
+                              request.id
+                            )
+                          }
+                        >
+                          DECLINE
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="profile-subsection">
+              <h3>
+                MY FRIENDS ({friends.length})
+              </h3>
+
+              {friends.length === 0 ? (
+                <div className="empty-profile-row">
+                  No friends yet.
+                </div>
+              ) : (
+                <div className="profile-list">
+                  {friends.map((friend) => (
+                    <article
+                      className="profile-list-row"
+                      key={friend.friendshipId}
+                    >
+                      <div className="friend-profile-info">
+                        <strong>
+                          {friend.firstName}{' '}
+                          {friend.lastName}
+                        </strong>
+
+                        <span>{friend.email}</span>
+                      </div>
+
+                      <span
+                        className={`profile-friend-status ${statusClass(
+                          friend.studyStatus
+                        )}`}
+                      >
+                        {statusLabel(
+                          friend.studyStatus
+                        )}
+                      </span>
+
+                      <button
+                        type="button"
+                        className="profile-secondary-button small"
+                        onClick={() =>
+                          handleRemoveFriend(
+                            friend.friendshipId
+                          )
+                        }
+                      >
+                        REMOVE
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }
 
