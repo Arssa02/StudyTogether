@@ -248,3 +248,14 @@
     flex-wrap: wrap;
   }
 }
+
+.planned-start-button {
+  border: 1px solid #202737 !important;
+  background: #202737 !important;
+  color: #ffffff !important;
+}
+
+.planned-start-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

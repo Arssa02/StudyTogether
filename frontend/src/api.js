@@ -118,3 +118,8 @@ export const joinStudySession = (sessionId) =>
   apiRequest(`/study-sessions/${sessionId}/join`, {
     method: 'POST',
   });
+
+  export const startPlannedStudySession = (plannedSessionId) =>
+  apiRequest(`/study-sessions/planned/${plannedSessionId}/start`, {
+    method: 'POST',
+  });

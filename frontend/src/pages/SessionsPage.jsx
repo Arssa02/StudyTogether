@@ -8,6 +8,7 @@ import {
   getMyPlannedSessions,
   getActiveStudySessions,
   joinStudySession,
+  startPlannedStudySession,
 } from '../api';
 
 import './SessionsPage.css';
@@ -20,6 +21,8 @@ function SessionsPage() {
 
   const [error, setError] = useState('');
   const [joiningId, setJoiningId] = useState(null);
+
+  const [startingPlannedId, setStartingPlannedId] = useState(null);
 
   const loadSessions = async () => {
     try {
@@ -64,6 +67,22 @@ function SessionsPage() {
       await loadSessions();
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleStartPlanned = async (plannedSessionId) => {
+    try {
+      setError('');
+      setStartingPlannedId(plannedSessionId);
+
+      const result = await startPlannedStudySession(
+        plannedSessionId
+      );
+
+      navigate(`/study-room/${result.session.id}`);
+    } catch (err) {
+      setError(err.message);
+      setStartingPlannedId(null);
     }
   };
 
@@ -214,70 +233,98 @@ function SessionsPage() {
             </div>
           ) : (
             <div className="planned-session-list">
-              {plannedSessions.map((session) => (
-                <article
-                  className="planned-session-row"
-                  key={session.id}
-                >
-                  <div className="planned-session-date">
-                    <strong>
-                      {new Date(
-                        session.start_time
-                      ).toLocaleDateString([], {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </strong>
+              {plannedSessions.map((session) => {
+                const now = new Date();
+                const start = new Date(session.start_time);
+                const end = new Date(session.end_time);
 
-                    <span>
-                      {new Date(
-                        session.start_time
-                      ).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
+                const canStart =
+                  now >= start &&
+                  now <= end &&
+                  session.session_id === null;
 
-                  <div className="planned-session-info">
-                    <strong>
-                      {session.title}
-                    </strong>
+                return (
+                  <article
+                    className="planned-session-row"
+                    key={session.id}
+                  >
+                    <div className="planned-session-date">
+                      <strong>
+                        {new Date(
+                          session.start_time
+                        ).toLocaleDateString([], {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </strong>
 
-                    <span>
-                      {new Date(
-                        session.start_time
-                      ).toLocaleString()}
-                      {' → '}
-                      {new Date(
-                        session.end_time
-                      ).toLocaleString()}
-                    </span>
-                  </div>
+                      <span>
+                        {new Date(
+                          session.start_time
+                        ).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
 
-                  <div className="planned-session-actions">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(
-                          `/planned-sessions/${session.id}/edit`
-                        )
-                      }
-                    >
-                      EDIT
-                    </button>
+                    <div className="planned-session-info">
+                      <strong>
+                        {session.title}
+                      </strong>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete(session.id)
-                      }
-                    >
-                      DELETE
-                    </button>
-                  </div>
-                </article>
-              ))}
+                      <span>
+                        {new Date(
+                          session.start_time
+                        ).toLocaleString()}
+                        {' → '}
+                        {new Date(
+                          session.end_time
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="planned-session-actions">
+                      {canStart && (
+                        <button
+                          type="button"
+                          className="planned-start-button"
+                          disabled={
+                            startingPlannedId === session.id
+                          }
+                          onClick={() =>
+                            handleStartPlanned(session.id)
+                          }
+                        >
+                          {startingPlannedId === session.id
+                            ? 'STARTING...'
+                            : '▶ START'}
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/planned-sessions/${session.id}/edit`
+                          )
+                        }
+                      >
+                        EDIT
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleDelete(session.id)
+                        }
+                      >
+                        DELETE
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
