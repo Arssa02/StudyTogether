@@ -100,9 +100,50 @@ const getUserStats = async (id) => {
     return userModel.getStudyStats(id);
 };
 
+const updateUserProfile = async (
+    id,
+    { firstName, lastName, email }
+) => {
+    if (
+        !firstName?.trim() ||
+        !lastName?.trim() ||
+        !email?.trim()
+    ) {
+        const error = new Error(
+            'First name, last name and email are required'
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const existingUser = await userModel.findByEmail(
+        email.trim()
+    );
+
+    if (existingUser && existingUser.id !== id) {
+        const error = new Error(
+            'Email already exists'
+        );
+        error.statusCode = 409;
+        throw error;
+    }
+
+    const updatedUser = await userModel.updateProfile(
+        id,
+        {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: email.trim(),
+        }
+    );
+
+    return sanitizeUser(updatedUser);
+};
+
 module.exports = {
     registerUser,
     loginUser,
     getUserById,
     getUserStats,
+    updateUserProfile,
 };

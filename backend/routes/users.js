@@ -14,4 +14,6 @@ router.get('/me', userController.getMe);
 // GET /api/users/stats
 router.get('/stats', userController.getStats);
 
+router.patch('/me', userController.updateMe);
+
 module.exports = router;

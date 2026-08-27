@@ -34,7 +34,30 @@ const getStats = async (req, res, next) => {
     }
 };
 
+const updateMe = async (req, res, next) => {
+    try {
+        const user = await userService.updateUserProfile(
+            req.user.id,
+            req.body
+        );
+
+        return res.status(200).json({
+            user,
+            message: 'Profile updated successfully',
+        });
+    } catch (err) {
+        if (err.statusCode) {
+            return res
+                .status(err.statusCode)
+                .json({ error: err.message });
+        }
+
+        return next(err);
+    }
+};
+
 module.exports = {
     getMe,
     getStats,
+    updateMe,
 };

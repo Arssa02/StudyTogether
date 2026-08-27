@@ -126,3 +126,17 @@ export const joinStudySession = (sessionId) =>
 
   export const getUserStats = () =>
   apiRequest('/users/stats');
+
+  export const updateCurrentUser = (
+  firstName,
+  lastName,
+  email
+) =>
+  apiRequest('/users/me', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      email,
+    }),
+  });

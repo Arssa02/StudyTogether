@@ -73,9 +73,29 @@ const getStudyStats = async (userId) => {
     };
 };
 
+const updateProfile = async (id, { firstName, lastName, email }) => {
+    const sql = `
+        UPDATE user
+        SET first_name = ?,
+            last_name = ?,
+            email = ?
+        WHERE id = ?
+    `;
+
+    await db.execute(sql, [
+        firstName,
+        lastName,
+        email,
+        id,
+    ]);
+
+    return findById(id);
+};
+
 module.exports = {
     findByEmail,
     findById,
     createUser,
     getStudyStats,
+    updateProfile,
 };

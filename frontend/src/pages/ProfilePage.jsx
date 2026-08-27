@@ -3,7 +3,11 @@ import {
   apiRequest,
   getCurrentUser,
   getUserStats,
+  updateCurrentUser,
 } from '../api';
+
+import AppNavbar from '../components/AppNavbar';
+import './ProfilePage.css';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -12,6 +16,9 @@ function ProfilePage() {
   const [friendEmail, setFriendEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
 
   const [stats, setStats] = useState({
     totalStudySeconds: 0,
@@ -35,6 +42,9 @@ function ProfilePage() {
       ]);
 
       setUser(userResult.user);
+      setFirstName(userResult.user.firstName);
+      setLastName(userResult.user.lastName);
+      setEmail(userResult.user.email);
       setFriends(friendsResult.friends);
       setRequests(requestsResult.requests);
       setStats(statsResult.stats);
@@ -46,6 +56,26 @@ function ProfilePage() {
   useEffect(() => {
     loadProfileData();
   }, []);
+
+  const handleSaveProfile = async (event) => {
+    event.preventDefault();
+
+    try {
+      setError('');
+      setMessage('');
+
+      const result = await updateCurrentUser(
+        firstName,
+        lastName,
+        email
+      );
+
+      setUser(result.user);
+      setMessage('Profile updated successfully.');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleSendRequest = async (event) => {
     event.preventDefault();
@@ -135,10 +165,48 @@ function ProfilePage() {
 
       <section>
         <h2>User Information</h2>
-        <p>
-          {user.firstName} {user.lastName}
-        </p>
-        <p>{user.email}</p>
+
+        <form onSubmit={handleSaveProfile}>
+          <label>
+            First Name
+            <input
+              type="text"
+              value={firstName}
+              onChange={(event) =>
+                setFirstName(event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <label>
+            Last Name
+            <input
+              type="text"
+              value={lastName}
+              onChange={(event) =>
+                setLastName(event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <label>
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
+              required
+            />
+          </label>
+
+          <button type="submit">
+            Save Changes
+          </button>
+        </form>
       </section>
 
       <section>
