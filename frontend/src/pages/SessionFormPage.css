@@ -1,0 +1,153 @@
+.session-form-page {
+  --text-h: #111827;
+  --text: #374151;
+
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 70px;
+  color: #1f2937;
+}
+
+.session-form-card {
+  width: min(620px, 100%);
+  margin: 0 auto;
+
+  border: 2px solid #202737;
+  background: #ffffff;
+}
+
+.plan-session-card {
+  width: min(720px, 100%);
+}
+
+.session-form-header {
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #cfd4dc;
+  background: #f4f5f7;
+}
+
+.session-form-header h1 {
+  margin: 0;
+  color: #111827 !important;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+}
+
+.session-form-header p {
+  margin: 7px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.session-form {
+  display: grid;
+  gap: 22px;
+
+  padding: 24px;
+}
+
+.session-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.session-form label span {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.session-form input {
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: 48px;
+  padding: 11px 13px;
+
+  border: 1px solid #9ca3af;
+  background: #ffffff;
+  color: #111827;
+
+  font: inherit;
+  font-size: 14px;
+}
+
+.session-form input:focus {
+  outline: 2px solid #202737;
+  outline-offset: 1px;
+}
+
+.session-form-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.session-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding-top: 4px;
+}
+
+.session-primary-button,
+.session-secondary-button {
+  min-height: 44px;
+  padding: 10px 18px;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.session-primary-button {
+  border: 1px solid #202737;
+  background: #202737;
+  color: #ffffff;
+}
+
+.session-secondary-button {
+  border: 1px solid #9ca3af;
+  background: #ffffff;
+  color: #111827;
+}
+
+.session-primary-button:hover {
+  background: #303744;
+}
+
+.session-secondary-button:hover {
+  background: #f3f4f6;
+}
+
+.session-primary-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.session-form-error {
+  margin: 18px 24px 0;
+  padding: 10px 12px;
+
+  border: 1px solid #dc2626;
+  background: #ffffff;
+
+  color: #991b1b;
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .session-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .session-form-actions {
+    flex-direction: column;
+  }
+}
