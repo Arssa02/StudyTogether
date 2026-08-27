@@ -42,7 +42,9 @@ const startPlanned = async (req, res, next) => {
 
 const getActive = async (req, res, next) => {
     try {
-        const sessions = await studySessionService.getActiveSessions();
+        const sessions = await studySessionService.getActiveSessions(
+            req.user.id
+        );
         return res.status(200).json({ sessions });
     } catch (err) {
         return next(err);

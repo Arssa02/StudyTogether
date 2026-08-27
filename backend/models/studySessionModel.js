@@ -22,33 +22,83 @@ const findById = async (id) => {
     return rows[0] || null;
 };
 
-const getActive = async () => {
+const getActiveForUser = async (currentUserId) => {
     const sql = `
         SELECT
             s.id,
             s.creator_id,
             s.title,
             s.start_time,
-            u.first_name,
-            u.last_name,
-            COUNT(p.id) AS participant_count
+
+            creator.first_name,
+            creator.last_name,
+
+            COUNT(DISTINCT active_participants.id) AS participant_count,
+
+            MAX(
+                CASE
+                    WHEN my_participation.user_id = ?
+                         AND my_participation.left_at IS NULL
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS is_participating
+
         FROM study_session s
-        JOIN user u ON u.id = s.creator_id
-        LEFT JOIN participation p
-            ON p.session_id = s.id
-            AND p.left_at IS NULL
+
+        JOIN user creator
+            ON creator.id = s.creator_id
+
+        LEFT JOIN participation active_participants
+            ON active_participants.session_id = s.id
+           AND active_participants.left_at IS NULL
+
+        LEFT JOIN participation my_participation
+            ON my_participation.session_id = s.id
+           AND my_participation.user_id = ?
+
         WHERE s.end_time IS NULL
+
+          AND (
+              EXISTS (
+                  SELECT 1
+                  FROM participation p_me
+                  WHERE p_me.session_id = s.id
+                    AND p_me.user_id = ?
+                    AND p_me.left_at IS NULL
+              )
+
+              OR EXISTS (
+                  SELECT 1
+                  FROM friend f
+                  WHERE f.status = 'accepted'
+                    AND (
+                        (f.user_id = ? AND f.friend_id = s.creator_id)
+                        OR
+                        (f.friend_id = ? AND f.user_id = s.creator_id)
+                    )
+              )
+          )
+
         GROUP BY
             s.id,
             s.creator_id,
             s.title,
             s.start_time,
-            u.first_name,
-            u.last_name
+            creator.first_name,
+            creator.last_name
+
         ORDER BY s.start_time DESC
     `;
 
-    const [rows] = await db.execute(sql);
+    const [rows] = await db.execute(sql, [
+        currentUserId,
+        currentUserId,
+        currentUserId,
+        currentUserId,
+        currentUserId,
+    ]);
+
     return rows;
 };
 
@@ -65,6 +115,6 @@ const endSession = async (id) => {
 module.exports = {
     create,
     findById,
-    getActive,
+    getActiveForUser,
     endSession,
 };

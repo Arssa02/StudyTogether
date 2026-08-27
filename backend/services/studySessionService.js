@@ -88,8 +88,8 @@ const startFromPlannedSession = async (currentUserId, plannedSessionId) => {
     return studySessionModel.findById(sessionId);
 };
 
-const getActiveSessions = async () => {
-    return studySessionModel.getActive();
+const getActiveSessions = async (currentUserId) => {
+    return studySessionModel.getActiveForUser(currentUserId);
 };
 
 const joinSession = async (currentUserId, sessionId) => {

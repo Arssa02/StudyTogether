@@ -110,3 +110,11 @@ export const leaveStudySession = (sessionId) =>
   apiRequest(`/study-sessions/${sessionId}/leave`, {
     method: 'POST',
   });
+
+  export const getActiveStudySessions = () =>
+  apiRequest('/study-sessions/active');
+
+export const joinStudySession = (sessionId) =>
+  apiRequest(`/study-sessions/${sessionId}/join`, {
+    method: 'POST',
+  });
