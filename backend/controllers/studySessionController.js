@@ -12,6 +12,10 @@ const start = async (req, res, next) => {
                 req.body.title
             );
 
+        const io = req.app.get('io');
+
+        io.emit('active-sessions-updated');
+
         return res.status(201).json({ session });
     } catch (err) {
         if (err.statusCode) {
@@ -29,6 +33,10 @@ const startPlanned = async (req, res, next) => {
                 req.user.id,
                 Number(req.params.plannedSessionId)
             );
+
+        const io = req.app.get('io');
+
+        io.emit('active-sessions-updated');
 
         return res.status(201).json({ session });
     } catch (err) {
@@ -63,6 +71,7 @@ const join = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('active-sessions-updated');
 
         return res.status(201).json(result);
     } catch (err) {
@@ -83,9 +92,12 @@ const leave = async (req, res, next) => {
 
         const io = req.app.get('io');
 
+
+
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
+        io.emit('active-sessions-updated');
         await notifyFriendsStatusChanged(
             io,
             req.user.id

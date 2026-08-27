@@ -13,6 +13,8 @@ import {
 
 import './SessionsPage.css';
 
+import socket, { connectSocket } from '../socket';
+
 function SessionsPage() {
   const navigate = useNavigate();
 
@@ -43,6 +45,35 @@ function SessionsPage() {
 
   useEffect(() => {
     loadSessions();
+  }, []);
+
+  useEffect(() => {
+    connectSocket();
+
+    const handleSessionsUpdated = async () => {
+      try {
+        const activeResult =
+          await getActiveStudySessions();
+
+        setActiveSessions(activeResult.sessions);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    socket.on(
+      'active-sessions-updated',
+      handleSessionsUpdated
+    );
+
+    return () => {
+      socket.off(
+        'active-sessions-updated',
+        handleSessionsUpdated
+      );
+
+      socket.disconnect();
+    };
   }, []);
 
   const handleJoin = async (sessionId) => {
