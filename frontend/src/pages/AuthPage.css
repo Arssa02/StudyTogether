@@ -1,0 +1,167 @@
+.auth-page {
+  min-height: 100svh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  background: #f4f4f4;
+  color: #111827;
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  box-sizing: border-box;
+
+  padding: 34px;
+
+  border: 3px solid #202737;
+  background: #ffffff;
+}
+
+.register-card {
+  width: min(460px, 100%);
+}
+
+.auth-card-header {
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+
+  border-bottom: 1px solid #cfd4dc;
+
+  text-align: center;
+}
+
+.auth-card-header h1 {
+  margin: 0;
+
+  color: #111827 !important;
+
+  font-size: 22px;
+  letter-spacing: 0.05em;
+}
+
+.auth-form {
+  display: grid;
+  gap: 20px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-form label span {
+  color: #111827;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.auth-form input {
+  width: 100%;
+  box-sizing: border-box;
+
+  min-height: 52px;
+  padding: 12px 15px;
+
+  border: 1px solid #9ca3af;
+  background: #ffffff;
+
+  color: #111827;
+
+  font: inherit;
+  font-size: 15px;
+}
+
+.auth-form input::placeholder {
+  color: #9ca3af;
+}
+
+.auth-form input:focus {
+  outline: 2px solid #202737;
+  outline-offset: 1px;
+}
+
+.auth-primary-button {
+  min-height: 52px;
+  margin-top: 4px;
+
+  border: 1px solid #202737;
+  background: #202737;
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.auth-primary-button:hover {
+  background: #303744;
+}
+
+.auth-primary-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.auth-divider {
+  margin: 24px 0;
+
+  border-top: 1px solid #cfd4dc;
+}
+
+.auth-switch {
+  text-align: center;
+}
+
+.auth-switch p {
+  margin: 0 0 12px;
+
+  color: #374151;
+  font-size: 13px;
+}
+
+.auth-secondary-button {
+  display: inline-block;
+
+  padding: 9px 18px;
+
+  border: 1px solid #9ca3af;
+  background: #ffffff;
+  color: #111827;
+
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.auth-secondary-button:hover {
+  background: #f3f4f6;
+}
+
+.auth-error {
+  margin: 0;
+  padding: 10px 12px;
+
+  border: 1px solid #dc2626;
+  background: #ffffff;
+
+  color: #991b1b;
+  font-size: 12px;
+}
+
+@media (max-width: 520px) {
+  .auth-page {
+    align-items: flex-start;
+    padding-top: 24px;
+  }
+
+  .auth-card {
+    padding: 24px;
+  }
+}
