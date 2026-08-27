@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import socket from '../socket';
+import socket, { connectSocket } from '../socket';
 import AppNavbar from '../components/AppNavbar';
 
 import {
@@ -59,7 +59,7 @@ function StudyRoomPage() {
     }, [activityHistory, currentActivity]);
 
     useEffect(() => {
-        socket.connect();
+        connectSocket();
 
         socket.emit('join-study-room', id);
 

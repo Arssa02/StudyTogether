@@ -1,5 +1,9 @@
 const studyActivityService = require('../services/studyActivityService');
 
+const {
+    notifyFriendsStatusChanged,
+} = require('../utils/socketNotifications');
+
 const start = async (req, res, next) => {
     try {
         const activity = await studyActivityService.startStudying(
@@ -12,7 +16,10 @@ const start = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('friend-status-updated');
+        await notifyFriendsStatusChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(201).json({ activity });
     } catch (err) {
@@ -36,7 +43,10 @@ const takeBreak = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('friend-status-updated');
+        await notifyFriendsStatusChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(201).json({ activity });
     } catch (err) {
@@ -60,7 +70,10 @@ const resume = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('friend-status-updated');
+        await notifyFriendsStatusChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(201).json({ activity });
     } catch (err) {

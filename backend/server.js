@@ -16,13 +16,15 @@ const io = new Server(server, {
   },
 });
 
+const jwt = require('jsonwebtoken');
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Health check endpoint
-app.get('/api/health',  (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
@@ -53,8 +55,35 @@ server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth.token;
+
+    if (!token) {
+      return next(new Error('Authentication required'));
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    socket.userId = decoded.id;
+
+    next();
+  } catch (err) {
+    next(new Error('Invalid token'));
+  }
+});
+
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
+
+  socket.join(`user-${socket.userId}`);
+
+  console.log(
+    `Socket ${socket.id} joined user-${socket.userId}`
+  );
 
   socket.on('join-study-room', (sessionId) => {
     socket.join(`study-session-${sessionId}`);

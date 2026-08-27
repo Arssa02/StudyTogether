@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import socket from '../socket';
+import socket, { connectSocket } from '../socket';
 
 import AppNavbar from '../components/AppNavbar';
 
@@ -56,7 +56,7 @@ function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    socket.connect();
+    connectSocket();
 
     const handleFriendStatusUpdate = async () => {
       try {

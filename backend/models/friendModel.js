@@ -212,6 +212,27 @@ const getAcceptedFriendsWithStatus = async (currentUserId) => {
     return rows;
 };
 
+const getAcceptedFriendIds = async (currentUserId) => {
+    const sql = `
+        SELECT
+            CASE
+                WHEN user_id = ? THEN friend_id
+                ELSE user_id
+            END AS friend_id
+        FROM friend
+        WHERE status = 'accepted'
+          AND (user_id = ? OR friend_id = ?)
+    `;
+
+    const [rows] = await db.execute(sql, [
+        currentUserId,
+        currentUserId,
+        currentUserId,
+    ]);
+
+    return rows.map((row) => row.friend_id);
+};
+
 module.exports = {
     findByPair,
     createRequest,
@@ -222,4 +243,5 @@ module.exports = {
     getAcceptedFriends,
     getAcceptedFriendsWithStatus,
     areAcceptedFriends,
+    getAcceptedFriendIds
 };

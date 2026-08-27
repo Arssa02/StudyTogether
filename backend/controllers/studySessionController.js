@@ -1,5 +1,9 @@
 const studySessionService = require('../services/studySessionService');
 
+const {
+    notifyFriendsStatusChanged,
+} = require('../utils/socketNotifications');
+
 const start = async (req, res, next) => {
     try {
         const session =
@@ -80,7 +84,10 @@ const leave = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('friend-status-updated');
+        await notifyFriendsStatusChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(200).json(result);
     } catch (err) {
