@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   apiRequest,
   getCurrentUser,
+  getUserStats,
 } from '../api';
 
 function ProfilePage() {
@@ -12,20 +13,31 @@ function ProfilePage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  const [stats, setStats] = useState({
+    totalStudySeconds: 0,
+    sessionsCompleted: 0,
+  });
+
   const loadProfileData = async () => {
     try {
       setError('');
 
-      const [userResult, friendsResult, requestsResult] =
-        await Promise.all([
-          getCurrentUser(),
-          apiRequest('/friends'),
-          apiRequest('/friends/requests'),
-        ]);
+      const [
+        userResult,
+        friendsResult,
+        requestsResult,
+        statsResult,
+      ] = await Promise.all([
+        getCurrentUser(),
+        apiRequest('/friends'),
+        apiRequest('/friends/requests'),
+        getUserStats(),
+      ]);
 
       setUser(userResult.user);
       setFriends(friendsResult.friends);
       setRequests(requestsResult.requests);
+      setStats(statsResult.stats);
     } catch (err) {
       setError(err.message);
     }
@@ -100,6 +112,20 @@ function ProfilePage() {
     return <p>Loading...</p>;
   }
 
+  const formatStudyTime = (totalSeconds) => {
+    const hours = Math.floor(totalSeconds / 3600);
+
+    const minutes = Math.floor(
+      (totalSeconds % 3600) / 60
+    );
+
+    if (hours === 0) {
+      return `${minutes}m`;
+    }
+
+    return `${hours}h ${minutes}m`;
+  };
+
   return (
     <main className="profile-page">
       <h1>Profile</h1>
@@ -117,9 +143,19 @@ function ProfilePage() {
 
       <section>
         <h2>Study Statistics</h2>
-        <p>Total study time: —</p>
-        <p>Sessions completed: —</p>
-        <p>Friends: {friends.length}</p>
+        <p>
+          Total study time:{' '}
+          {formatStudyTime(stats.totalStudySeconds)}
+        </p>
+
+        <p>
+          Sessions completed:{' '}
+          {stats.sessionsCompleted}
+        </p>
+
+        <p>
+          Friends: {friends.length}
+        </p>
       </section>
 
       <section>

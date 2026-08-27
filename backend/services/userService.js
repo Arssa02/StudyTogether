@@ -88,9 +88,21 @@ const getUserById = async (id) => {
     return sanitizeUser(user);
 };
 
-// makes functions usable in controllers
+const getUserStats = async (id) => {
+    const user = await userModel.findById(id);
+
+    if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return userModel.getStudyStats(id);
+};
+
 module.exports = {
     registerUser,
     loginUser,
     getUserById,
+    getUserStats,
 };

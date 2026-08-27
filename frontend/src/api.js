@@ -123,3 +123,6 @@ export const joinStudySession = (sessionId) =>
   apiRequest(`/study-sessions/planned/${plannedSessionId}/start`, {
     method: 'POST',
   });
+
+  export const getUserStats = () =>
+  apiRequest('/users/stats');

@@ -25,9 +25,57 @@ const createUser = async ({ firstName, lastName, email, hashedPassword }) => {
 	return result.insertId;
 };
 
-// makes functions usable in other files
+const getStudyStats = async (userId) => {
+    const sql = `
+        SELECT
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN sa.type = 'study'
+                        THEN TIMESTAMPDIFF(
+                            SECOND,
+                            sa.start_time,
+                            COALESCE(sa.end_time, NOW())
+                        )
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_study_seconds,
+
+            COUNT(
+                DISTINCT CASE
+                    WHEN ss.end_time IS NOT NULL
+                    THEN p.session_id
+                END
+            ) AS sessions_completed
+
+        FROM participation p
+
+        LEFT JOIN study_session ss
+            ON ss.id = p.session_id
+
+        LEFT JOIN study_activity sa
+            ON sa.participation_id = p.id
+
+        WHERE p.user_id = ?
+    `;
+
+    const [rows] = await db.execute(sql, [userId]);
+
+    return {
+        totalStudySeconds: Number(
+            rows[0].total_study_seconds
+        ),
+        sessionsCompleted: Number(
+            rows[0].sessions_completed
+        ),
+    };
+};
+
 module.exports = {
-	findByEmail,
-	findById,
-	createUser,
+    findByEmail,
+    findById,
+    createUser,
+    getStudyStats,
 };

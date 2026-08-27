@@ -16,6 +16,25 @@ const getMe = async (req, res, next) => {
     }
 };
 
+const getStats = async (req, res, next) => {
+    try {
+        const stats = await userService.getUserStats(
+            req.user.id
+        );
+
+        return res.status(200).json({ stats });
+    } catch (err) {
+        if (err.statusCode) {
+            return res
+                .status(err.statusCode)
+                .json({ error: err.message });
+        }
+
+        return next(err);
+    }
+};
+
 module.exports = {
     getMe,
+    getStats,
 };
