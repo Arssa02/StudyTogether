@@ -9,6 +9,7 @@ import {
   getFriends,
   getMyPlannedSessions,
   getFriendPlannedSessions,
+  getUserStats,
 } from '../api';
 
 import './DashboardPage.css';
@@ -29,6 +30,8 @@ function DashboardPage() {
   const [friends, setFriends] = useState([]);
   const [mySessions, setMySessions] = useState([]);
 
+  const [stats, setStats] = useState(null);
+
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [friendSessions, setFriendSessions] = useState([]);
 
@@ -37,16 +40,22 @@ function DashboardPage() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [userResult, friendsResult, sessionsResult] =
-          await Promise.all([
-            getCurrentUser(),
-            getFriends(),
-            getMyPlannedSessions(),
-          ]);
+        const [
+          userResult,
+          friendsResult,
+          sessionsResult,
+          statsResult,
+        ] = await Promise.all([
+          getCurrentUser(),
+          getFriends(),
+          getMyPlannedSessions(),
+          getUserStats(),
+        ]);
 
         setUser(userResult.user);
         setFriends(friendsResult.friends);
         setMySessions(sessionsResult.sessions);
+        setStats(statsResult.stats);
       } catch (err) {
         setError(err.message);
       }
@@ -311,6 +320,17 @@ function DashboardPage() {
     return null;
   };
 
+  const formatStudyTime = (seconds = 0) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+
+    return `${minutes}m`;
+  };
+
   if (!user) {
     return <p className="dashboard-loading">Loading...</p>;
   }
@@ -376,12 +396,6 @@ function DashboardPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="small-outline-button"
-              >
-                DAY VIEW
-              </button>
             </div>
 
             <div className="calendar-grid">
@@ -572,12 +586,34 @@ function DashboardPage() {
 
               <div className="stats-row">
                 <span>Study Time</span>
-                <strong>—</strong>
+                <strong>
+                  {formatStudyTime(stats?.todayStudySeconds)}
+                </strong>
               </div>
 
               <div className="stats-row">
                 <span>Sessions</span>
-                <strong>—</strong>
+                <strong>
+                  {stats?.todaySessions ?? 0}
+                </strong>
+              </div>
+            </section>
+
+            <section className="sidebar-box">
+              <h2>This Week</h2>
+
+              <div className="stats-row">
+                <span>Study Time</span>
+                <strong>
+                  {formatStudyTime(stats?.weekStudySeconds)}
+                </strong>
+              </div>
+
+              <div className="stats-row">
+                <span>Sessions</span>
+                <strong>
+                  {stats?.weekSessions ?? 0}
+                </strong>
               </div>
             </section>
 
