@@ -2,7 +2,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
@@ -37,8 +36,6 @@ app.use('/api/friends', require('./routes/friends'));
 app.use('/api/planned-sessions', require('./routes/plannedSessions'));
 app.use('/api/study-sessions', require('./routes/studySessions'));
 
-// to be implemented
-// study activity endpoints for study/break tracking
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,122 +1,247 @@
-# StudyTogether - Social Study Session Coordination and Tracking System
+# StudyTogether
 
-## Project Overview
+StudyTogether is a web application for coordinating and tracking study sessions between friends.
 
-StudyTogether is a web application designed to help students organize, coordinate, and track collaborative study sessions with friends. The system provides a structured way to create study groups, join sessions, track study activity, and visualize progress through statistics and calendar views.
+Users can connect with other registered users, plan study sessions, compare planned study times, start or join active study sessions, track study and break intervals, and view study statistics.
 
-## Features
+The project was developed as the implementation component of the Systems III course at UP FAMNIT.
 
-1. **User Management** - Registration, login, profile management, and friend management
-2. **Study Session Management** - Create, edit, and delete study sessions
-3. **Session Participation** - Join or leave study sessions created by friends
-4. **Study Activity Tracking** - Track study and break intervals within sessions
-5. **Visualization** - View friend study status and generate weekly/daily statistics
-6. **Calendar View** - Plan and visualize study sessions
-7. **Access Control** - Friend-based access control and data privacy
+## Main Features
 
-## Tech Stack
+### User Management
+- User registration and login
+- JWT-based authentication
+- Password hashing using bcrypt
+- Profile viewing and editing
 
-- **Frontend**: React, Bootstrap, HTML5, CSS, JavaScript
-- **Backend**: Express.js, Node.js
-- **Database**: MySQL
-- **Server**: 88.200.63.148
+### Friend Management
+- Send friend requests to registered users
+- Accept or decline incoming friend requests
+- Remove existing friends
+- View friends' current study status
+- Study-related information is shared only between accepted friends
 
-## Getting Started
+### Planned Study Sessions
+- Create planned study sessions with a title, start time, and end time
+- Edit or delete planned sessions
+- View planned sessions in a weekly calendar
+- View accepted friends' planned sessions
+- Visually compare overlapping planned study times
+- Start a planned session during its scheduled time interval
+- A planned session can create at most one active study session
 
-### Prerequisites
+### Active Study Sessions
+- Start a spontaneous study session
+- View active study sessions of friends
+- Join and leave active study sessions
+- View current participants
+- Sessions automatically end when the last participant leaves
+- Completed sessions remain stored for study statistics
 
-- Node.js (v14+)
-- MySQL Server
-- npm or yarn
+### Study Activity Tracking
+- Start studying
+- Take a break
+- Resume studying
+- Record study and break intervals
+- Calculate actual study time from recorded activity intervals
 
-### Installation
+### Real-Time Updates
+Socket.IO is used for near-real-time updates, including:
+- participant changes inside a study room
+- participant study/break status
+- friends' current study status
+- changes to visible active study sessions
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd StudyTogetherImplementation
-```
+### Study Statistics
+- Today's study time and number of study sessions
+- Current week's study time and number of study sessions
+- Lifetime study time
+- Number of completed study sessions
 
-2. Install dependencies:
-```bash
-npm install
-```
+## Technology Stack
 
-3. Configure environment variables:
-```bash
-# Edit .env file with your database credentials
-DB_HOST=88.200.63.148
-DB_USER=studenti
-DB_PASSWORD=S039C8R7
-DB_NAME=SISIII2026_YOUR_STUDENT_NUMBER
-PORT=3001
-JWT_SECRET=your_secret_key
-```
+### Frontend
+- React
+- Vite
+- JavaScript
+- CSS
+- Socket.IO Client
 
-4. Start the server:
-```bash
-npm start
-```
+### Backend
+- Node.js
+- Express
+- Socket.IO
+- JSON Web Tokens (JWT)
+- bcrypt
 
-Server will run on `http://localhost:3001`
+### Database
+- MySQL
+- phpMyAdmin for database administration
 
 ## Project Structure
 
-```
-StudyTogetherImplementation/
+```text
+StudyTogether/
 ├── backend/
-│   ├── config/
-│   │   └── database.js          # Database connection
-│   ├── controllers/             # Business logic
-│   ├── routes/                  # API endpoints
-│   ├── middleware/              # Authentication, error handling
-│   └── server.js                # Main entry point
-├── frontend/                    # React app (to be created)
-├── .env                         # Environment variables
-├── .gitignore                   # Git ignore rules
-├── package.json                 # Dependencies
-└── README.md                    # This file
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── .env
+│   └── server.js
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── api.js
+│   │   └── socket.js
+│   └── .env
+│
+├── database/
+├── README.md
+└── package.json
 ```
 
-## API Documentation
+Environment files are excluded from the Git repository and must be created separately.
 
-API endpoints will be documented as they are implemented.
+## Database Structure
 
-## Database Schema
+The application uses the following main tables:
 
-The database consists of 6 main tables:
-- `user` - User profiles
-- `friend` - Friendship relationships
-- `study_session` - Study sessions
-- `participation` - Session participation records
-- `study_activity` - Study/break activity tracking
-- `calendar_event` - Planned study events
+- `user` — registered users
+- `friend` — friend requests and accepted friendship relationships
+- `planned_session` — study sessions planned for a future time
+- `study_session` — actual active or completed study sessions
+- `participation` — records users joining and leaving study sessions
+- `study_activity` — records study and break intervals
 
-## Development
+A planned session may optionally create one actual study session. Actual study sessions can also be started spontaneously without a planned session.
 
-### Branching Strategy
+## Environment Configuration
 
-- `main` - Production-ready code
-- `develop` - Active development branch
-- `feature/*` - Feature branches
+Environment variables are stored in `.env` files and are not committed to Git.
 
-### Commit Messages
+The backend requires configuration for:
 
-Use descriptive commit messages:
-```
-Add user authentication endpoints
-Implement study session CRUD operations
-Create database migration scripts
+```env
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+JWT_SECRET=
 ```
 
-## Deployment
+The frontend requires the backend API configuration used by the application.
 
-The application will be deployed to the university server at `88.200.63.148`.
+Do not commit real database credentials or JWT secrets to the repository.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Arssa02/StudyTogether
+cd StudyTogether
+```
+
+### Backend
+
+Install backend dependencies:
+
+```bash
+cd backend
+npm install
+```
+
+Create the required backend `.env` file and configure the database connection and JWT secret.
+
+Start the backend:
+
+```bash
+node server.js
+```
+
+The backend runs on port `3001`.
+
+### Frontend
+
+In another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+For access from another machine on the network/server:
+
+```bash
+npm run dev -- --host
+```
+
+The Vite development server normally runs on port `5173`.
+
+## University Server Deployment
+
+The application is deployed on the university student server.
+
+After pushing tested changes to the Git repository, update the server copy with:
+
+```bash
+cd ~/Desktop/SysIII-StudyTogether-Implementation/StudyTogether
+git pull origin develop
+```
+
+Start the backend from the backend directory:
+
+```bash
+cd backend
+node server.js
+```
+
+Start the frontend from the frontend directory:
+
+```bash
+cd frontend
+npm run dev -- --host
+```
+
+The backend must be started from the `backend` directory so that its environment configuration is loaded correctly.
+
+## Development Workflow
+
+The project uses a multiple-stability branching strategy.
+
+- `main` — stable, tested versions
+- `develop` — ongoing development and integration
+
+Development is performed on `develop`. Tested submission-ready changes are merged into `main`.
+
+## Access Control
+
+Protected backend routes require authentication using a JWT.
+
+Study-related information is restricted according to ownership and accepted friendship relationships. For example:
+
+- users can modify only their own planned sessions
+- users can view study information shared by accepted friends
+- users can join eligible active sessions of friends
+- participant information is available only where permitted by the application rules
+
+## Study Time Calculation
+
+Study time is derived from recorded `study_activity` intervals rather than being stored as a separate accumulated value.
+
+Only intervals with type `study` contribute to study-time statistics. Break intervals are stored but are not counted as active study time.
+
+This allows daily, weekly, and lifetime statistics to be calculated from the underlying activity records.
 
 ## Author
 
-Arsenije Đorđević
-
-## Course
-
-Systems III - Information Systems Development
+Arsenije Đorđević  
+Computer Science  
+UP FAMNIT
