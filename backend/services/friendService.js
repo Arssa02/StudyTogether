@@ -3,7 +3,17 @@ const userModel = require('../models/userModel');
 
 // Send a friend request using the other user's email.
 const sendFriendRequest = async (currentUserId, email) => {
-    const targetUser = await userModel.findByEmail(email);
+    if (!email?.trim()) {
+        const error = new Error('Email is required');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const targetUser = await userModel.findByEmail(
+        normalizedEmail
+    );
 
     if (!targetUser) {
         const error = new Error('User not found');
@@ -12,7 +22,9 @@ const sendFriendRequest = async (currentUserId, email) => {
     }
 
     if (targetUser.id === currentUserId) {
-        const error = new Error('You cannot send a friend request to yourself');
+        const error = new Error(
+            'You cannot send a friend request to yourself'
+        );
         error.statusCode = 400;
         throw error;
     }
@@ -21,7 +33,10 @@ const sendFriendRequest = async (currentUserId, email) => {
     const userId = Math.min(currentUserId, targetUser.id);
     const friendId = Math.max(currentUserId, targetUser.id);
 
-    const existing = await friendModel.findByPair(userId, friendId);
+    const existing = await friendModel.findByPair(
+        userId,
+        friendId
+    );
 
     if (existing) {
         if (existing.status === 'accepted') {
@@ -30,7 +45,9 @@ const sendFriendRequest = async (currentUserId, email) => {
             throw error;
         }
 
-        const error = new Error('A friend request already exists');
+        const error = new Error(
+            'A friend request already exists'
+        );
         error.statusCode = 409;
         throw error;
     }
@@ -146,7 +163,7 @@ const getFriends = async (currentUserId) => {
         email: row.email,
         friendsSince: row.created_on,
         studyStatus: row.study_status,
-    }));    
+    }));
 };
 
 // Remove an accepted friend.

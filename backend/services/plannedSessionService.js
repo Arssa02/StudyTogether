@@ -29,8 +29,8 @@ const createPlannedSession = async (
     }
 
     if (!startTime || !endTime) {
-    const error = new Error(
-        'Start time and end time are required'
+        const error = new Error(
+            'Start time and end time are required'
     );
     error.statusCode = 400;
     throw error;
@@ -76,6 +76,14 @@ const updatePlannedSession = async (
         error.statusCode = 400;
         throw error;
     }
+
+    if (!startTime || !endTime) {
+    const error = new Error(
+        'Start time and end time are required'
+    );
+    error.statusCode = 400;
+    throw error;
+}
 
     validateTimes(startTime, endTime);
 

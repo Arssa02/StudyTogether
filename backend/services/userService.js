@@ -68,19 +68,29 @@ const registerUser = async ({
     return sanitizeUser(createdUser); // return safe user (no password and clean format)
 };
 
-// Validates credentials and returns a JWT plus safe user data.
 const loginUser = async ({ email, password }) => {
-    const user = await userModel.findByEmail(email);
+    if (!email?.trim() || !password) {
+        const error = new Error('Email and password are required');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const user = await userModel.findByEmail(normalizedEmail);
 
     if (!user) {
-        // for the security reason don't reveal which one is wrong
+        // For security, don't reveal whether the email or password is wrong.
         const error = new Error('Invalid email or password');
         error.statusCode = 401;
         throw error;
     }
 
-    // compare plain with hashed password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Compare plain password with hashed password.
+    const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password
+    );
 
     if (!isPasswordValid) {
         const error = new Error('Invalid email or password');
@@ -97,9 +107,6 @@ const loginUser = async ({ email, password }) => {
         { expiresIn: '7d' }
     );
 
-    // final response -> { token: "JWT_TOKEN", user: { id: 1, firstName: "Arsenije", 
-    // lastName: "...",    email: "..." }}
-    // return token (for authentication) and user (for displaying info)
     return {
         token,
         user: sanitizeUser(user),
