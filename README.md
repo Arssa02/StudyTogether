@@ -46,6 +46,7 @@ The project was developed as the implementation component of the Systems III cou
 - Calculate actual study time from recorded activity intervals
 
 ### Real-Time Updates
+
 Socket.IO is used for near-real-time updates, including:
 - participant changes inside a study room
 - participant study/break status
@@ -83,12 +84,14 @@ Socket.IO is used for near-real-time updates, including:
 ```text
 StudyTogether/
 ├── backend/
+│   ├── config/
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
 │   ├── services/
 │   ├── utils/
+│   ├── schema.sql
 │   ├── .env
 │   └── server.js
 │
@@ -99,14 +102,15 @@ StudyTogether/
 │   │   ├── pages/
 │   │   ├── api.js
 │   │   └── socket.js
-│   └── .env
+│   ├── vite.config.js
+│   └── package.json
 │
-├── database/
-├── README.md
-└── package.json
+├── package.json
+├── package-lock.json
+└── README.md
 ```
 
-Environment files are excluded from the Git repository and must be created separately.
+The backend `.env` file is excluded from the Git repository and must be created separately.
 
 ## Database Structure
 
@@ -123,7 +127,7 @@ A planned session may optionally create one actual study session. Actual study s
 
 ## Environment Configuration
 
-Environment variables are stored in `.env` files and are not committed to Git.
+Backend environment variables are stored in `backend/.env` and are not committed to Git.
 
 The backend requires configuration for:
 
@@ -135,7 +139,7 @@ DB_NAME=
 JWT_SECRET=
 ```
 
-The frontend requires the backend API configuration used by the application.
+The frontend does not require a separate environment file for the current development setup. API and Socket.IO requests use relative paths and are proxied by Vite to the backend running on port `3001`.
 
 Do not commit real database credentials or JWT secrets to the repository.
 
@@ -144,24 +148,30 @@ Do not commit real database credentials or JWT secrets to the repository.
 Clone the repository:
 
 ```bash
-git clone https://github.com/Arssa02/StudyTogether
+git clone https://github.com/Arssa02/StudyTogether.git
 cd StudyTogether
 ```
 
 ### Backend
 
-Install backend dependencies:
+Install backend dependencies from the project root:
 
 ```bash
-cd backend
 npm install
 ```
 
-Create the required backend `.env` file and configure the database connection and JWT secret.
+Create `backend/.env` and configure the database connection and JWT secret.
+
+The database structure can be created using:
+
+```text
+backend/schema.sql
+```
 
 Start the backend:
 
 ```bash
+cd backend
 node server.js
 ```
 
@@ -169,7 +179,7 @@ The backend runs on port `3001`.
 
 ### Frontend
 
-In another terminal:
+In another terminal, from the project root:
 
 ```bash
 cd frontend
@@ -183,13 +193,13 @@ For access from another machine on the network/server:
 npm run dev -- --host
 ```
 
-The Vite development server normally runs on port `5173`.
+The Vite development server normally starts on port `5173`, although it may select another available port.
 
 ## University Server Deployment
 
 The application is deployed on the university student server.
 
-After pushing tested changes to the Git repository, update the server copy with:
+During development, the server copy can be updated from the `develop` branch:
 
 ```bash
 cd ~/Desktop/SysIII-StudyTogether-Implementation/StudyTogether
@@ -211,6 +221,8 @@ npm run dev -- --host
 ```
 
 The backend must be started from the `backend` directory so that its environment configuration is loaded correctly.
+
+For the final stable submission, the tested `develop` branch is merged into `main`.
 
 ## Development Workflow
 
