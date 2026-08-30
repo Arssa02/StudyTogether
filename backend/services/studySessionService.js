@@ -133,10 +133,21 @@ const joinSession = async (currentUserId, sessionId) => {
         sessionId,
     });
 
-    return { participationId };
+    return {
+        participationId,
+        creatorId: session.creator_id,
+    };
 };
 
 const leaveSession = async (currentUserId, sessionId) => {
+
+    const session = await studySessionModel.findById(sessionId);
+
+    if (!session) {
+        const error = new Error('Study session not found');
+        error.statusCode = 404;
+        throw error;
+    }
     const participation =
         await participationModel.findActiveByUserAndSession(
             currentUserId,
@@ -163,6 +174,7 @@ const leaveSession = async (currentUserId, sessionId) => {
     return {
         message: 'Left study session',
         sessionEnded: activeCount === 0,
+        creatorId: session.creator_id,
     };
 };
 

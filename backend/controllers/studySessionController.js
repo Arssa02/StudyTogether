@@ -2,6 +2,7 @@ const studySessionService = require('../services/studySessionService');
 
 const {
     notifyFriendsStatusChanged,
+    notifyActiveSessionsChanged,
 } = require('../utils/socketNotifications');
 
 const start = async (req, res, next) => {
@@ -14,7 +15,10 @@ const start = async (req, res, next) => {
 
         const io = req.app.get('io');
 
-        io.emit('active-sessions-updated');
+        await notifyActiveSessionsChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(201).json({ session });
     } catch (err) {
@@ -36,7 +40,10 @@ const startPlanned = async (req, res, next) => {
 
         const io = req.app.get('io');
 
-        io.emit('active-sessions-updated');
+        await notifyActiveSessionsChanged(
+            io,
+            req.user.id
+        );
 
         return res.status(201).json({ session });
     } catch (err) {
@@ -71,9 +78,15 @@ const join = async (req, res, next) => {
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('active-sessions-updated');
 
-        return res.status(201).json(result);
+        await notifyActiveSessionsChanged(
+            io,
+            result.creatorId
+        );
+
+        return res.status(201).json({
+            participationId: result.participationId,
+        });
     } catch (err) {
         if (err.statusCode) {
             return res.status(err.statusCode).json({ error: err.message });
@@ -92,18 +105,24 @@ const leave = async (req, res, next) => {
 
         const io = req.app.get('io');
 
-
-
         io
             .to(`study-session-${req.params.id}`)
             .emit('study-room-updated');
-        io.emit('active-sessions-updated');
+
+        await notifyActiveSessionsChanged(
+            io,
+            result.creatorId
+        );
+
         await notifyFriendsStatusChanged(
             io,
             req.user.id
         );
 
-        return res.status(200).json(result);
+        return res.status(200).json({
+            message: result.message,
+            sessionEnded: result.sessionEnded,
+        });
     } catch (err) {
         if (err.statusCode) {
             return res.status(err.statusCode).json({ error: err.message });
