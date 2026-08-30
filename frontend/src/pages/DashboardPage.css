@@ -1,11 +1,8 @@
 .app-navbar {
     border-bottom: 1px solid #d7dbe3;
     background: #ffffff;
-
-    .app-navbar {
-        --text-h: #111827;
-        --text: #374151;
-    }
+    --text-h: #111827;
+    --text: #374151;
 }
 
 .navbar-inner {

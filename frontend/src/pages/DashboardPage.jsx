@@ -148,11 +148,6 @@ function DashboardPage() {
       day: 'numeric',
     });
 
-  const isSameDay = (dateA, dateB) =>
-    dateA.getFullYear() === dateB.getFullYear() &&
-    dateA.getMonth() === dateB.getMonth() &&
-    dateA.getDate() === dateB.getDate();
-
   const getDayStart = (date) => {
     const result = new Date(date);
     result.setHours(0, 0, 0, 0);
@@ -261,64 +256,6 @@ function DashboardPage() {
 
     return result;
   }, [mySessions, friendSessions]);
-
-  const getSessionForCell = (date, hour) => {
-    const overlap = overlaps.find((item) => {
-      const overlapDate = item.start;
-
-      return (
-        isSameDay(overlapDate, date) &&
-        overlapDate.getHours() >= hour &&
-        overlapDate.getHours() < hour + 3
-      );
-    });
-
-    if (overlap) {
-      return {
-        type: 'overlap',
-        title: overlap.mine.title,
-        subtitle: 'BOTH',
-      };
-    }
-
-    const mine = mySessions.find((session) => {
-      const start = new Date(session.start_time);
-
-      return (
-        isSameDay(start, date) &&
-        start.getHours() >= hour &&
-        start.getHours() < hour + 3
-      );
-    });
-
-    if (mine) {
-      return {
-        type: 'mine',
-        title: mine.title,
-        subtitle: 'YOU',
-      };
-    }
-
-    const theirs = friendSessions.find((session) => {
-      const start = new Date(session.start_time);
-
-      return (
-        isSameDay(start, date) &&
-        start.getHours() >= hour &&
-        start.getHours() < hour + 3
-      );
-    });
-
-    if (theirs) {
-      return {
-        type: 'friend',
-        title: theirs.title,
-        subtitle: selectedFriend?.firstName || 'FRIEND',
-      };
-    }
-
-    return null;
-  };
 
   const formatStudyTime = (seconds = 0) => {
     const hours = Math.floor(seconds / 3600);

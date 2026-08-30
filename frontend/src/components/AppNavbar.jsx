@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import socket from '../socket';
 
 function AppNavbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    socket.disconnect();
     localStorage.removeItem('token');
     navigate('/login');
   };

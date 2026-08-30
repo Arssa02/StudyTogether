@@ -111,7 +111,7 @@ export const leaveStudySession = (sessionId) =>
     method: 'POST',
   });
 
-  export const getActiveStudySessions = () =>
+export const getActiveStudySessions = () =>
   apiRequest('/study-sessions/active');
 
 export const joinStudySession = (sessionId) =>
@@ -119,15 +119,15 @@ export const joinStudySession = (sessionId) =>
     method: 'POST',
   });
 
-  export const startPlannedStudySession = (plannedSessionId) =>
+export const startPlannedStudySession = (plannedSessionId) =>
   apiRequest(`/study-sessions/planned/${plannedSessionId}/start`, {
     method: 'POST',
   });
 
-  export const getUserStats = () =>
+export const getUserStats = () =>
   apiRequest('/users/stats');
 
-  export const updateCurrentUser = (
+export const updateCurrentUser = (
   firstName,
   lastName,
   email

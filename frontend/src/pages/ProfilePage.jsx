@@ -66,7 +66,6 @@ function ProfilePage() {
     loadProfileData();
   }, []);
 
-  // Real-time friend status updates on Profile
   useEffect(() => {
     connectSocket();
 
